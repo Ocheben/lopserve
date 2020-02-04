@@ -1,0 +1,184 @@
+import React from 'react';
+import {Dimensions, View} from 'react-native';
+import 'react-native-gesture-handler';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import {createSwitchNavigator, createAppContainer} from 'react-navigation';
+import {createDrawerNavigator} from 'react-navigation-drawer';
+import {createStackNavigator} from 'react-navigation-stack';
+import Login from './Screens/AuthScreens/Login/Login';
+import Dashboard from './Screens/Home/Home';
+import Fund from './Screens/Home/Fund';
+import Sidebar from './Components/Sidebar';
+import Profile from './Screens/Profile/Profile';
+import ChangePassword from './Screens/Profile/ChangePassword';
+import EditProfile from './Screens/Profile/EditProfile';
+import {
+  LogoImg,
+  BlockView,
+  Content,
+  colors,
+  SText,
+} from './Components/styledComponents';
+import {GridIcon, MenuIcon, EditIcon} from './Components/icons';
+import SignUp from './Screens/AuthScreens/Login/SignUp';
+
+const logo = require('./assets/img/logo.png');
+const {height, width} = Dimensions.get('window');
+
+const HomeStack = createStackNavigator({
+  Home: {
+    screen: Dashboard,
+    navigationOptions: ({navigation}) => ({
+      headerTitle: (
+        <Content
+          justify="space-between"
+          hpadding={12}
+          align="center"
+          vmargin={10}
+          bg={colors.primary}
+          height={height / 10}
+          horizontal>
+          <TouchableOpacity
+            style={{width: 40}}
+            onPress={() => navigation.openDrawer()}>
+            <MenuIcon color="#ffffff" size={20} />
+          </TouchableOpacity>
+          <LogoImg
+            source={logo}
+            width={width * 0.3}
+            resizeMode="contain"
+            style={{alignSelf: 'center'}}
+          />
+          <View style={{width: 40}} />
+        </Content>
+      ),
+    }),
+  },
+  Fund: {
+    screen: Fund,
+    navigationOptions: ({navigation}) => ({
+      headerTitle: 'Fund',
+      headerStyle: {
+        backgroundColor: colors.primary,
+      },
+      headerTitleStyle: {
+        fontWeight: 'bold',
+        fontSize: 25,
+        color: '#ffffff',
+      },
+      headerTintColor: '#ffffff',
+    }),
+  },
+});
+
+const ProfileStack = createStackNavigator({
+  Profile: {
+    screen: Profile,
+    navigationOptions: ({navigation}) => ({
+      headerTitle: (
+        <Content
+          shadow
+          justify="flex-start"
+          hpadding={12}
+          align="center"
+          bg={colors.primary}
+          vmargin={10}
+          height={height / 10}
+          horizontal>
+          <TouchableOpacity
+            style={{width: 40}}
+            onPress={() => navigation.openDrawer()}>
+            <MenuIcon color="#ffffff" size={20} />
+          </TouchableOpacity>
+          {
+            // <LogoImg source={logo} width={width * 0.3} resizeMode="contain" />
+          }
+          <SText size="25px" weight="700" color="#ffffff">
+            Profile
+          </SText>
+          <></>
+        </Content>
+      ),
+    }),
+  },
+  ChangePassword: {
+    screen: ChangePassword,
+    navigationOptions: ({navigation}) => ({
+      headerTitle: 'Change Password',
+      headerStyle: {
+        backgroundColor: colors.primary,
+      },
+      headerTitleStyle: {
+        fontWeight: 'bold',
+        fontSize: 25,
+        color: '#ffffff',
+      },
+      headerTintColor: '#ffffff',
+    }),
+  },
+  EditProfile: {
+    screen: EditProfile,
+    navigationOptions: ({navigation}) => ({
+      headerTitle: 'Edit Profile',
+      headerStyle: {
+        backgroundColor: colors.primary,
+      },
+      headerTitleStyle: {
+        fontWeight: 'bold',
+        fontSize: 25,
+        color: '#ffffff',
+      },
+      headerTintColor: '#ffffff',
+    }),
+  },
+});
+
+const AuthStack = createStackNavigator({
+  Login: {
+    screen: Login,
+    navigationOptions: {
+      header: null,
+    },
+  },
+  SignUp: {
+    screen: SignUp,
+    navigationOptions: {
+      header: null,
+      headerStyle: {
+        elevation: 0,
+      },
+    },
+  },
+});
+
+export const SignedIn = createDrawerNavigator(
+  {
+    Dashboard: {
+      screen: HomeStack,
+    },
+    Profile: {
+      screen: ProfileStack,
+    },
+  },
+  {
+    contentComponent: Sidebar,
+    drawerWidth: 300,
+  },
+);
+
+export const createRootNavigator = (signedIn = false) =>
+  createAppContainer(
+    createSwitchNavigator(
+      {
+        SignedIn: {
+          screen: SignedIn,
+        },
+        SignedOut: {
+          screen: AuthStack,
+        },
+      },
+      {
+        initialRouteName: signedIn ? 'SignedIn' : 'SignedOut',
+      },
+    ),
+  );
