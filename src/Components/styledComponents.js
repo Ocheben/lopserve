@@ -3,7 +3,7 @@ import {Input} from 'native-base';
 
 export const colors = {
   // primary: '#37bf86',
-  primary: '#004059',
+  primary: '#fdbd0f',
   dark: '#363636',
 };
 

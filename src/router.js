@@ -7,7 +7,7 @@ import {createDrawerNavigator} from 'react-navigation-drawer';
 import {createStackNavigator} from 'react-navigation-stack';
 import Login from './Screens/AuthScreens/Login/Login';
 import Dashboard from './Screens/Home/Home';
-import Fund from './Screens/Home/Fund';
+import RequestGas from './Screens/Home/RequestGas';
 import Sidebar from './Components/Sidebar';
 import Profile from './Screens/Profile/Profile';
 import ChangePassword from './Screens/Profile/ChangePassword';
@@ -35,7 +35,7 @@ const HomeStack = createStackNavigator({
           hpadding={12}
           align="center"
           vmargin={10}
-          bg={colors.primary}
+          bg="#ffffff"
           height={height / 10}
           horizontal>
           <TouchableOpacity
@@ -45,7 +45,7 @@ const HomeStack = createStackNavigator({
           </TouchableOpacity>
           <LogoImg
             source={logo}
-            width={width * 0.3}
+            width={width * 0.4}
             resizeMode="contain"
             style={{alignSelf: 'center'}}
           />
@@ -54,19 +54,33 @@ const HomeStack = createStackNavigator({
       ),
     }),
   },
-  Fund: {
-    screen: Fund,
+  RequestGas: {
+    screen: RequestGas,
     navigationOptions: ({navigation}) => ({
-      headerTitle: 'Fund',
-      headerStyle: {
-        backgroundColor: colors.primary,
-      },
-      headerTitleStyle: {
-        fontWeight: 'bold',
-        fontSize: 25,
-        color: '#ffffff',
-      },
-      headerTintColor: '#ffffff',
+      headerTitle: (
+        <Content
+          justify="space-between"
+          hpadding={12}
+          align="center"
+          vmargin={10}
+          bg="#ffffff"
+          height={height / 10}
+          horizontal>
+          <TouchableOpacity
+            style={{width: 40}}
+            onPress={() => navigation.openDrawer()}>
+            <MenuIcon color="#ffffff" size={20} />
+          </TouchableOpacity>
+          <LogoImg
+            source={logo}
+            width={width * 0.4}
+            resizeMode="contain"
+            style={{alignSelf: 'center'}}
+          />
+          <View style={{width: 40}} />
+        </Content>
+      ),
+      headerLeft: null,
     }),
   },
 });

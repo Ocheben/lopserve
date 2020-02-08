@@ -19,12 +19,12 @@ import {login} from '../../../_store/actions/authActions';
 import { LostCoinIcon } from '../../../Components/Vectors';
 
 const {height, width} = Dimensions.get('window');
-const logo = require('../../../assets/img/logoblue.png');
+const logo = require('../../../assets/img/logo.png');
 
 const Login = props => {
   const {navigation, dispatch, userInfo} = props;
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const signIn = async user => {
     await onSignIn(user);
@@ -32,34 +32,34 @@ const Login = props => {
   };
 
   const handleSubmit = async () => {
-    // navigation.navigate('SignedIn');
-    const {
-      baseUrl,
-      login: {method, path},
-    } = APIS;
-    console.log(path);
-    const submitUrl = `${baseUrl}${path}`;
+    navigation.navigate('SignedIn');
+    // const {
+    //   baseUrl,
+    //   login: {method, path},
+    // } = APIS;
+    // console.log(path);
+    // const submitUrl = `${baseUrl}${path}`;
 
-    setLoading(true);
-    const response = await request(method, submitUrl, {email, password});
-    console.log(response, method, submitUrl, {email, password});
-    if (response.access_token) {
-      Toast.show({
-        ...toastDefault,
-        text: 'You have successfully logged in',
-        type: 'success',
-      });
-      setLoading(false);
-      dispatch(login({...response, isLoggedin: true}));
-      await signIn(JSON.stringify(response));
-    } else {
-      Toast.show({
-        ...toastDefault,
-        text: 'Invalid username or password',
-        type: 'danger',
-      });
-    }
-    setLoading(false);
+    // setLoading(true);
+    // const response = await request(method, submitUrl, {email, password});
+    // console.log(response, method, submitUrl, {email, password});
+    // if (response.access_token) {
+    //   Toast.show({
+    //     ...toastDefault,
+    //     text: 'You have successfully logged in',
+    //     type: 'success',
+    //   });
+    //   setLoading(false);
+    //   dispatch(login({...response, isLoggedin: true}));
+    //   await signIn(JSON.stringify(response));
+    // } else {
+    //   Toast.show({
+    //     ...toastDefault,
+    //     text: 'Invalid username or password',
+    //     type: 'danger',
+    //   });
+    // }
+    // setLoading(false);
   };
 
   return (
@@ -76,47 +76,45 @@ const Login = props => {
       }}>
     <StatusBar backgroundColor={colors.dark} barStyle="light-content" />
       <Content flex={0.3} justify="space-evenly">
-        <LogoImg source={logo} width={width * 0.3} resizeMode="contain" />
-        {/* <LostCoinIcon size={width * 0.2} /> */}
-        <SText size="18px" color="#777777">
-          Log In to your account
-        </SText>
+        <LogoImg source={logo} width={width * 0.7} resizeMode="contain" />
       </Content>
-      <Content flex={0.3} width="90%">
-        <Item style={{marginBottom: 15}}>
-          <AtIcon color={colors.primary} size={30} />
-          <SNInput
-            floatingLabel
-            placeholder="Email/Phone"
-            keyboardType="email-address"
-            textContentType="emailAddress"
+      <Content flex={0.3} width="85%">
+        <Item style={{marginBottom: 15}} floatingLabel>
+          {/* <AtIcon color={colors.primary} size={30} /> */}
+          <Label>Phone</Label>
+          <Input
+            placeholder="Phone"
+            keyboardType="number-pad"
+            textContentType="telephoneNumber"
             style={{color: '#444444'}}
-            onChangeText={text => setEmail(text)}
+            onChangeText={text => setPhone(text)}
+            value={phone}
           />
         </Item>
-        <Item>
-          <LockIcon color={colors.primary} size={30} />
-          <SNInput
-            floatingLabel
+        <Item floatingLabel>
+          {/* <LockIcon color={colors.primary} size={30} /> */}
+          <Label>Password</Label>
+          <Input
             placeholder="Password"
             secureTextEntry
             textContentType="password"
             style={{color: '#444444'}}
             onChangeText={text => setPassword(text)}
+            value={password}
           />
         </Item>
       </Content>
       <Content flex={0.2} justify="space-evenly">
         <StyledButton
-          curved
           bg={colors.primary}
-          width="90%"
+          width="85%"
+          height={65}
           onPress={() => handleSubmit()}>
           {loading ? (
             <Spinner color="#ffffff" />
           ) : (
-            <SText size="20px" color="#ffffff">
-              Log In
+            <SText size="24px" weight="700" color="#ffffff">
+              LOGIN
             </SText>
           )}
         </StyledButton>
