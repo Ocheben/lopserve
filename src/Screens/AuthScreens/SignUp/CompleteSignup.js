@@ -14,21 +14,19 @@ import {
   Input,
 } from 'native-base';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import {onSignOut} from '../../_services';
-import {getContri} from '../../_store/actions/userActions';
 import {
   SText,
   Content,
+  LogoImg,
   ContentButton,
   StyledButton,
   colors,
-} from '../../Components/styledComponents';
-import {NextIcon} from '../../Components/icons';
-import {RsaIcon} from '../../Components/Vectors';
+} from '../../../Components/styledComponents';
 
 const {height, width} = Dimensions.get('window');
+const logo = require('../../../assets/img/logo.png');
 
-const RequestGas = props => {
+const CompleteSignup = props => {
   const {navigation, dispatch, userInfo, userData} = props;
   const cylinderSize = navigation.getParam('cylinderSize') || '12';
   const [formInputs, setFormInputs] = useState({});
@@ -49,59 +47,15 @@ const RequestGas = props => {
         resetScrollToCoords={{x: 0, y: 0}}
         contentContainerStyle={{flexGrow: 1, width: width}}>
         <View>
-          <StatusBar
-            backgroundColor={colors.primary}
-            barStyle="light-content"
-          />
+          <StatusBar backgroundColor={colors.dark} barStyle="light-content" />
           <View style={{alignItems: 'center', marginTop: 30}}>
-            <Content width="90%" vmargin={10} flex={0} align="center">
-              <Item floatingLabel>
-                <Label>Gas Cylinder Size (kg)</Label>
-                <Input
-                  name="current_age"
-                  keyboardType="number-pad"
-                  value={formInputs.cylinderSize}
-                  disabled
-                  onChangeText={text =>
-                    setFormInputs(prev => ({...prev, cylinderSize: text}))
-                  }
-                />
-              </Item>
+            <Content flex={1}>
+              <LogoImg source={logo} width={width * 0.5} resizeMode="contain" />
             </Content>
-            <Content width="90%" vmargin={10} flex={0} align="flex-start">
-              <SText color="#777777" size="15px">
-                Gas
+            <Content flex={1} vmargin={10}>
+              <SText color="#444444" size="16px">
+                Complete your account information
               </SText>
-              <Item>
-                <Picker
-                  mode="dropdown"
-                  iosIcon={<Icon name="arrow-down" />}
-                  style={{width: undefined}}
-                  placeholder="Select Cylinder"
-                  placeholderStyle={{color: '#bfc6ea'}}
-                  placeholderIconColor="#007aff"
-                  selectedValue={formInputs.gasSize || null}
-                  onValueChange={value => setGasSize(value)}>
-                  <Picker.Item label="Select Gas" value={null} />
-                  <Picker.Item label="4kg" value="4" />
-                  <Picker.Item label="8kg" value="8" />
-                  <Picker.Item label="12kg" value="12" />
-                </Picker>
-              </Item>
-            </Content>
-            <Content width="90%" vmargin={10} flex={0} align="center">
-              <Item floatingLabel>
-                <Label>Total</Label>
-                <Input
-                  name="total"
-                  keyboardType="number-pad"
-                  value={formInputs.total || ' '}
-                  disabled
-                  onChangeText={text =>
-                    setFormInputs(prev => ({...prev, total: text}))
-                  }
-                />
-              </Item>
             </Content>
             <Content
               width="90%"
@@ -110,16 +64,16 @@ const RequestGas = props => {
               justify="flex-start"
               horizontal>
               <Item floatingLabel>
-                <Label>Pickup Address</Label>
+                <Label>Name</Label>
                 <Input
-                  name="pickupAddress"
+                  name="name"
                   keyboardType="default"
-                  textContentType="fullStreetAddress"
-                  value={formInputs.pickupAddress || ''}
+                  textContentType="name"
+                  value={formInputs.name || ''}
                   onChangeText={text =>
                     setFormInputs(prev => ({
                       ...prev,
-                      pickupAddress: text,
+                      name: text,
                     }))
                   }
                 />
@@ -132,16 +86,62 @@ const RequestGas = props => {
               justify="flex-start"
               horizontal>
               <Item floatingLabel>
-                <Label>Delivery Address</Label>
+                <Label>Email</Label>
                 <Input
-                  name="pickupAddress"
-                  keyboardType="default"
-                  textContentType="fullStreetAddress"
-                  value={formInputs.monthly_contribution || ''}
+                  name="email"
+                  keyboardType="email-address"
+                  textContentType="emailAddress"
+                  value={formInputs.email || ''}
                   onChangeText={text =>
                     setFormInputs(prev => ({
                       ...prev,
-                      monthly_contribution: text,
+                      email: text,
+                    }))
+                  }
+                />
+              </Item>
+            </Content>
+            <Content
+              width="90%"
+              vmargin={10}
+              flex={0}
+              justify="flex-start"
+              horizontal>
+              <Item floatingLabel>
+                <Label>Password</Label>
+                <Input
+                  name="password"
+                  keyboardType="default"
+                  textContentType="password"
+                  secureTextEntry
+                  value={formInputs.password || ''}
+                  onChangeText={text =>
+                    setFormInputs(prev => ({
+                      ...prev,
+                      password: text,
+                    }))
+                  }
+                />
+              </Item>
+            </Content>
+            <Content
+              width="90%"
+              vmargin={10}
+              flex={0}
+              justify="flex-start"
+              horizontal>
+              <Item floatingLabel>
+                <Label>Password</Label>
+                <Input
+                  name="confirmPassword"
+                  keyboardType="default"
+                  textContentType="password"
+                  secureTextEntry
+                  value={formInputs.conformPassword || ''}
+                  onChangeText={text =>
+                    setFormInputs(prev => ({
+                      ...prev,
+                      confirmPassword: text,
                     }))
                   }
                 />
@@ -149,18 +149,18 @@ const RequestGas = props => {
             </Content>
           </View>
         </View>
-        <Content width="100%" flex={0} justify="flex-end">
+        <Content width="100%" flex={0}>
           <StyledButton
             bg={colors.primary}
-            width="100%"
-            onPress={() =>
-              navigation.navigate('Pay', {amount: formInputs.total})
-            }>
+            curved
+            shadow
+            width="90%"
+            onPress={() => navigation.navigate('SignedIn')}>
             {loading ? (
               <Spinner color="#ffffff" />
             ) : (
               <SText size="20px" weight="700" color="#ffffff">
-                CONFIRM
+                Sign Up
               </SText>
             )}
           </StyledButton>
@@ -175,4 +175,4 @@ const mapStateToProps = state => ({
   userData: state.userData,
 });
 
-export default connect(mapStateToProps)(RequestGas);
+export default connect(mapStateToProps)(CompleteSignup);

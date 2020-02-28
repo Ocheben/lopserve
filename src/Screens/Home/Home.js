@@ -21,9 +21,10 @@ import {
 import {MenuIcon} from '../../Components/icons';
 import {formatDate} from '../../_helpers';
 import {Spinner, Item, Picker, Icon, CheckBox, Body} from 'native-base';
+import {Advert} from '../../Components/Components';
 
 const {height, width} = Dimensions.get('window');
-const logo = require('../../assets/img/logo.png');
+const ad = require('../../assets/img/ad.png');
 
 const Home = props => {
   const {navigation, dispatch, userInfo, userData} = props;
@@ -44,14 +45,10 @@ const Home = props => {
 
   return (
     <Content bg="#ffffff">
-      <StatusBar backgroundColor="#ffffff" barStyle="light-content" />
-      <Content
-        width="100%"
-        bg={colors.primary}
-        flex={4}
-        // blRadius={20}
-        // brRadius={20}
-      />
+      <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
+      <Content width="100%" bg={colors.primary} flex={4}>
+        <Advert img={ad} header="AD" />
+      </Content>
       <Content align="flex-start" width="80%" flex={4}>
         <Content align="flex-start">
           <SText color="#444444" align="left" size="15px">
@@ -93,8 +90,8 @@ const Home = props => {
           onPress={() =>
             navigation.navigate('RequestGas', {cylinderSize: cylinder})
           }>
-          <SText size="20px" color="#ffffff">
-            Next
+          <SText size="20px" weight="700" color="#ffffff">
+            NEXT
           </SText>
         </StyledButton>
       </Content>
