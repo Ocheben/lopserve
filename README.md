@@ -1,3 +1,3 @@
 # MPENSION
-React Native App for managing pension contributions and statements
-Built with React Native, Redux & Styled Components
+React Native App for Gas delivery (Rider app)  
+Built with React Native, Redux & Styled Components  
