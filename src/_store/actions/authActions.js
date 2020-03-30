@@ -1,9 +1,14 @@
 import {AUTHCONSTANTS} from '../constants';
 
-const {LOGIN, LOGOUT} = AUTHCONSTANTS;
+const {LOGIN, LOGOUT, SIGNUP} = AUTHCONSTANTS;
 
 export const login = userData => ({
   type: LOGIN,
+  payload: userData,
+});
+
+export const signup = userData => ({
+  type: SIGNUP,
   payload: userData,
 });
 

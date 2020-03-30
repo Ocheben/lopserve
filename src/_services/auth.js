@@ -6,7 +6,7 @@ export const TOKEN = 'jwt-auth-token';
 export const onSignIn = user => {
   console.log('onSignIn')
   console.log(user);
-  const token = JSON.parse(user).access_token;
+  const token = JSON.parse(user).token;
   AsyncStorage.multiSet([[USER_KEY, 'true'], ['user', user], [TOKEN, token]], (err) => {
     console.log(user);
     if (err) console.log(err);

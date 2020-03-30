@@ -28,12 +28,13 @@ const ad = require('../../assets/img/ad.png');
 
 const Home = props => {
   const {navigation, dispatch, userInfo, userData} = props;
-  const [cylinder, setCylinder] = useState('');
+  const [cylinder, setCylinder] = useState(null);
   const [buyCylinder, setBuyCylinder] = useState(false);
   const {
     loading,
     dashboard: {user, totalContributionsThisYear, lastContribution},
   } = userData;
+  const {cylinders} = userInfo;
   const signOut = () => {
     onSignOut();
     navigation.navigate('SignedOut');
@@ -67,9 +68,9 @@ const Home = props => {
             selectedValue={cylinder}
             onValueChange={value => setCylinder(value)}>
             <Picker.Item label="Select Cylinder" value={null} />
-            <Picker.Item label="4kg" value="4" />
-            <Picker.Item label="8kg" value="8" />
-            <Picker.Item label="12kg" value="12" />
+            {cylinders.map(item => (
+              <Picker.Item label={item.size} key={item.id} value={item.id} />
+            ))}
           </Picker>
         </Item>
         <Content horizontal justify="center">
@@ -87,6 +88,7 @@ const Home = props => {
         <StyledButton
           bg={colors.primary}
           width="100%"
+          disabled={cylinder === null}
           onPress={() =>
             navigation.navigate('RequestGas', {cylinderSize: cylinder})
           }>

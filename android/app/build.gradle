@@ -133,6 +133,11 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     signingConfigs {
         release {
@@ -190,6 +195,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-firebase')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
@@ -210,3 +216,5 @@ task copyDownloadableDepsToLibs(type: Copy) {
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
+com.google.gms.googleservices.GoogleServicesPlugin.config.disableVersionCheck = true
+apply plugin: "com.google.gms.google-services"

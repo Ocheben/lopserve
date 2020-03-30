@@ -3,24 +3,15 @@ import {connect} from 'react-redux';
 import {Dimensions, View, StatusBar} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import NumberFormat from 'react-number-format';
+import RNPaystack from 'react-native-paystack';
 import {
   CreditCardInput,
   LiteCreditCardInput,
 } from 'react-native-credit-card-input';
 import {WebView} from 'react-native-webview';
-import {
-  List,
-  ListItem,
-  Icon,
-  Spinner,
-  Item,
-  Picker,
-  Label,
-  Input,
-} from 'native-base';
+import {List, ListItem, Icon, Spinner, Item, Toast} from 'native-base';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import {onSignOut} from '../../_services';
-import {getContri} from '../../_store/actions/userActions';
+import {APIS, request, toastDefault} from '../../_services';
 import {
   SText,
   Content,
@@ -37,17 +28,59 @@ const paystackLogo = require('../../assets/img/paystack.png');
 
 const Pay = props => {
   const {navigation, dispatch, userInfo, userData} = props;
-  const amount = navigation.getParam('amount') || '4000';
+  const {email} = userInfo;
+  const inputs = navigation.getParam('inputs') || {};
   const [formInputs, setFormInputs] = useState({});
   const [loading, setLoading] = useState(false);
-  const [cardDetails, setCardDetalis] = useState({});
-  const [cardNumber, setCardNumber] = useState(null);
-  const [expiry, setExpiry] = useState(null);
-  const [cvc, setCvc] = useState(null);
+  const [cardDetails, setCardDetails] = useState({});
+  const [cardValid, setCardValid] = useState();
+  // const [cardNumber, setCardNumber] = useState(null);
+  // const [expiry, setExpiry] = useState(null);
+  // const [cvc, setCvc] = useState(null);
+  console.log(inputs);
 
-  const setGasSize = value => {
-    const cost = parseInt(value || 0, 10) * 300;
-    setFormInputs(prev => ({...prev, gasSize: value, total: cost.toString()}));
+  const chargeCard = () => {
+    const {number, expiry, cvc} = cardDetails;
+    console.log(expiry.split('/'));
+    setLoading(true);
+    RNPaystack.chargeCard({
+      cardNumber: number,
+      expiryMonth: expiry.split('/')[0],
+      expiryYear: expiry.split('/')[1],
+      cvc,
+      email,
+      amountInKobo: parseInt(inputs.total, 10) * 100,
+    })
+      .then(response => {
+        console.log(response);
+        setLoading(false);
+        Toast.show({
+          ...toastDefault,
+          text: 'Payment Succesfull',
+          type: 'success',
+        }); // card charged successfully, get reference here
+        setTimeout(() => navigation.navigate('Rider'), 2000);
+      })
+      .catch(error => {
+        setLoading(false);
+        Toast.show({
+          ...toastDefault,
+          text: 'Unable to complete payment',
+          type: 'danger',
+        });
+        console.log(error); // error is a javascript Error object
+        console.log(error.message);
+        console.log(error.code);
+      });
+  };
+  const checkDetails = e => {
+    const validCard = Object.values(e.status).every(val => val === 'valid');
+    console.log(validCard);
+    if (validCard) {
+      setCardDetails(e.values);
+    }
+    setCardValid(validCard);
+    return;
   };
 
   return (
@@ -67,7 +100,7 @@ const Pay = props => {
             }}>
             <Content justify="center" vmargin={10} flex={1}>
               <NumberFormat
-                value={parseInt(amount, 10)}
+                value={parseInt(inputs.total, 10)}
                 displayType={'text'}
                 thousandSeparator={true}
                 prefix={'\u20A6'}
@@ -84,7 +117,7 @@ const Pay = props => {
                 Enter Card Information
               </SText>
               <Item>
-                <LiteCreditCardInput onChange={setCardDetalis} />
+                <LiteCreditCardInput onChange={checkDetails} />
               </Item>
             </Content>
             <Content align="center" vmargin={10} flex={1} justify="center">
@@ -102,7 +135,8 @@ const Pay = props => {
           <StyledButton
             bg="#00AEEF"
             width="100%"
-            onPress={() => navigation.navigate('Rider')}>
+            onPress={chargeCard}
+            disabled={!cardValid}>
             {loading ? (
               <Spinner color="#ffffff" />
             ) : (

@@ -5,7 +5,7 @@ export const initState = {
   isLoggedIn: false,
 };
 
-const {LOGIN, LOGOUT} = AUTHCONSTANTS;
+const {LOGIN, LOGOUT, SIGNUP} = AUTHCONSTANTS;
 
 const userInfo = (state = initState, action) => {
   switch (action.type) {
@@ -20,6 +20,13 @@ const userInfo = (state = initState, action) => {
       return {
         ...initState,
         isLoggedIn: false,
+      };
+
+    case SIGNUP:
+      return {
+        ...state,
+        ...action.payload,
+        isLoggedIn: true,
       };
     default:
       return state;

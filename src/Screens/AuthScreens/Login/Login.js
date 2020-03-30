@@ -32,34 +32,33 @@ const Login = props => {
   };
 
   const handleSubmit = async () => {
-    navigation.navigate('SignedIn');
-    // const {
-    //   baseUrl,
-    //   login: {method, path},
-    // } = APIS;
-    // console.log(path);
-    // const submitUrl = `${baseUrl}${path}`;
+    const {
+      baseUrl,
+      login: {method, path},
+    } = APIS;
+    console.log(path);
+    const submitUrl = `${baseUrl}${path}`;
 
-    // setLoading(true);
-    // const response = await request(method, submitUrl, {email, password});
-    // console.log(response, method, submitUrl, {email, password});
-    // if (response.access_token) {
-    //   Toast.show({
-    //     ...toastDefault,
-    //     text: 'You have successfully logged in',
-    //     type: 'success',
-    //   });
-    //   setLoading(false);
-    //   dispatch(login({...response, isLoggedin: true}));
-    //   await signIn(JSON.stringify(response));
-    // } else {
-    //   Toast.show({
-    //     ...toastDefault,
-    //     text: 'Invalid username or password',
-    //     type: 'danger',
-    //   });
-    // }
-    // setLoading(false);
+    setLoading(true);
+    const response = await request(method, submitUrl, {phone, password});
+    console.log(response, method, submitUrl, {phone, password});
+    if (response.token) {
+      Toast.show({
+        ...toastDefault,
+        text: 'You have successfully logged in',
+        type: 'success',
+      });
+      setLoading(false);
+      dispatch(login({...response, isLoggedin: true}));
+      await signIn(JSON.stringify(response));
+    } else {
+      Toast.show({
+        ...toastDefault,
+        text: 'Invalid username or password',
+        type: 'danger',
+      });
+    }
+    setLoading(false);
   };
 
   return (
@@ -107,7 +106,9 @@ const Login = props => {
       <Content flex={0.2} justify="space-evenly">
         <StyledButton
           bg={colors.primary}
+          shadow
           width="85%"
+          curved
           height={65}
           onPress={() => handleSubmit()}>
           {loading ? (

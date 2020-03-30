@@ -1,8 +1,20 @@
 export const APIS = {
-  baseUrl: 'https://m-pension-api.herokuapp.com',
+  baseUrl: 'https://lopserv.herokuapp.com/lopser/v1',
+  initSignup: {
+    method: 'POST',
+    path: '/init',
+  },
+  verifyOtp: {
+    method: 'PUT',
+    path: '/init/verifyotp',
+  },
+  completeSignup: {
+    method: 'PUT',
+    path: '/init/complete',
+  },
   login: {
     method: 'POST',
-    path: '/api/auth/login',
+    path: '/auth',
   },
   changePassword: {
     method: 'POST',

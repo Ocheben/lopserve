@@ -14,6 +14,10 @@ import {
   Input,
 } from 'native-base';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import RNGooglePlacePicker from 'react-native-google-place-picker';
+import RNGooglePlaces from 'react-native-google-places';
+import MapView from 'react-native-maps';
+import {Marker} from 'react-native-maps';
 import {onSignOut} from '../../_services';
 import {getContri} from '../../_store/actions/userActions';
 import {
@@ -25,22 +29,95 @@ import {
 } from '../../Components/styledComponents';
 import {NextIcon} from '../../Components/icons';
 import {RsaIcon} from '../../Components/Vectors';
+import MapModal from '../../Components/MapModal';
 
 const {height, width} = Dimensions.get('window');
 
 const RequestGas = props => {
   const {navigation, dispatch, userInfo, userData} = props;
-  const cylinderSize = navigation.getParam('cylinderSize') || '12';
+  const {cylinders, unitprice} = userInfo;
+  const cylinderSize =
+    cylinders.find(e => e.id === navigation.getParam('cylinderSize')).size ||
+    '12';
   const [formInputs, setFormInputs] = useState({});
   const [loading, setLoading] = useState(false);
+  const [location, setLocation] = useState({});
+  const [mapReady, setMapReady] = useState(false);
+  const [region, setRegion] = useState({
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.001,
+    longitudeDelta: 0.001,
+  });
 
   useEffect(() => {
     setFormInputs(prev => ({...prev, cylinderSize: cylinderSize}));
+    setMapReady(true);
   }, [cylinderSize]);
 
   const setGasSize = value => {
-    const cost = parseInt(value || 0, 10) * 300;
+    const gasSize = cylinders.find(e => e.id === value).size.slice(0, 1);
+    console.log(gasSize);
+    const cost = parseInt(gasSize || 0, 10) * parseInt(unitprice, 10);
     setFormInputs(prev => ({...prev, gasSize: value, total: cost.toString()}));
+  };
+
+  const setPickup = () => {
+    // RNGooglePlacePicker.show(response => {
+    //   if (response.didCancel) {
+    //     console.log('User cancelled GooglePlacePicker');
+    //   } else if (response.error) {
+    //     console.log('GooglePlacePicker Error: ', response.error);
+    //   } else {
+    //     setLocation(response);
+    //   }
+    // });
+    RNGooglePlaces.openAutocompleteModal(
+      {
+        country: 'NG',
+        type: 'establishment',
+      },
+      ['name', 'location', 'address'],
+    )
+      .then(place => {
+        console.log(place);
+        setFormInputs(prev => ({
+          ...prev,
+          pickupAddress: place.address,
+          pickupLocation: place.location,
+        }));
+        // place represents user's selection from the
+        // suggestions and it is a simplified Google Place object.
+      })
+      .catch(error => console.log(error.message)); // error is a Javascript Error object
+  };
+
+  const setDelivery = () => {
+    RNGooglePlaces.openAutocompleteModal(
+      {
+        country: 'NG',
+        type: 'establishment',
+      },
+      ['name', 'location', 'address'],
+    )
+      .then(place => {
+        console.log(place);
+        setFormInputs(prev => ({
+          ...prev,
+          deliveryAddress: place.address,
+          deliveryLocation: place.location,
+        }));
+      })
+      .catch(error => console.log(error.message));
+  };
+
+  const onSelectLocation = (selectedLocation, id) => {
+    console.log(selectedLocation, id);
+    setFormInputs(prev => ({
+      ...prev,
+      [`${id}Address`]: selectedLocation.address,
+      [`${id}Location`]: selectedLocation.coordinates,
+    }));
   };
 
   return (
@@ -54,9 +131,11 @@ const RequestGas = props => {
             barStyle="light-content"
           />
           <View style={{alignItems: 'center', marginTop: 30}}>
-            <Content width="90%" vmargin={10} flex={0} align="center">
-              <Item floatingLabel>
-                <Label>Gas Cylinder Size (kg)</Label>
+            <Content width="90%" vmargin={10} flex={0} align="flex-start">
+              <SText color="#777777" size="15px">
+                Gas Cylinder Size
+              </SText>
+              <Item>
                 <Input
                   name="current_age"
                   keyboardType="number-pad"
@@ -83,9 +162,13 @@ const RequestGas = props => {
                   selectedValue={formInputs.gasSize || null}
                   onValueChange={value => setGasSize(value)}>
                   <Picker.Item label="Select Gas" value={null} />
-                  <Picker.Item label="4kg" value="4" />
-                  <Picker.Item label="8kg" value="8" />
-                  <Picker.Item label="12kg" value="12" />
+                  {cylinders.map(item => (
+                    <Picker.Item
+                      label={item.size}
+                      key={item.id}
+                      value={item.id}
+                    />
+                  ))}
                 </Picker>
               </Item>
             </Content>
@@ -109,13 +192,14 @@ const RequestGas = props => {
               flex={0}
               justify="flex-start"
               horizontal>
-              <Item floatingLabel>
+              {/* <Item floatingLabel>
                 <Label>Pickup Address</Label>
                 <Input
                   name="pickupAddress"
                   keyboardType="default"
                   textContentType="fullStreetAddress"
                   value={formInputs.pickupAddress || ''}
+                  onFocus={() => openLocation()}
                   onChangeText={text =>
                     setFormInputs(prev => ({
                       ...prev,
@@ -123,7 +207,20 @@ const RequestGas = props => {
                     }))
                   }
                 />
-              </Item>
+              </Item> */}
+            </Content>
+            <Content
+              width="90%"
+              vmargin={10}
+              bmargin={30}
+              flex={0}
+              justify="flex-start"
+              horizontal>
+              <MapModal
+                selectLocation={onSelectLocation}
+                name="Pickup Address"
+                id="pickup"
+              />
             </Content>
             <Content
               width="90%"
@@ -131,21 +228,11 @@ const RequestGas = props => {
               flex={0}
               justify="flex-start"
               horizontal>
-              <Item floatingLabel>
-                <Label>Delivery Address</Label>
-                <Input
-                  name="pickupAddress"
-                  keyboardType="default"
-                  textContentType="fullStreetAddress"
-                  value={formInputs.monthly_contribution || ''}
-                  onChangeText={text =>
-                    setFormInputs(prev => ({
-                      ...prev,
-                      monthly_contribution: text,
-                    }))
-                  }
-                />
-              </Item>
+              <MapModal
+                selectLocation={onSelectLocation}
+                name="Delivery Address"
+                id="delivery"
+              />
             </Content>
           </View>
         </View>
@@ -153,9 +240,7 @@ const RequestGas = props => {
           <StyledButton
             bg={colors.primary}
             width="100%"
-            onPress={() =>
-              navigation.navigate('Pay', {amount: formInputs.total})
-            }>
+            onPress={() => navigation.navigate('Pay', {inputs: formInputs})}>
             {loading ? (
               <Spinner color="#ffffff" />
             ) : (

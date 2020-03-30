@@ -14,6 +14,7 @@ import {
   View,
   Text,
   StatusBar,
+  Alert,
 } from 'react-native';
 
 import {
@@ -25,6 +26,8 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import {Root} from 'native-base';
 import SplashScreen from 'react-native-splash-screen';
+import AsyncStorage from '@react-native-community/async-storage';
+import firebase from 'react-native-firebase';
 
 import {PersistGate} from 'redux-persist/integration/react';
 import {Provider} from 'react-redux';
@@ -34,6 +37,8 @@ import {store, persistor} from './src/_store/store';
 import {isSignedIn} from './src/_services';
 import {createRootNavigator} from './src/router';
 
+import PushController from './src/Components/PushController';
+
 const App: () => React$Node = () => {
   const [signedIn, setSignedIn] = useState(false);
   const [checkedSignIn, setCheckedSignIn] = useState(false);
@@ -41,6 +46,8 @@ const App: () => React$Node = () => {
   useEffect(() => {
     checkSignIn();
     SplashScreen.hide();
+    checkPermission();
+    messageListener();
   }, []);
 
   const checkSignIn = () => {
@@ -50,6 +57,76 @@ const App: () => React$Node = () => {
         setCheckedSignIn(true);
       })
       .catch(err => alert('An error occurred', err));
+  };
+
+  //1
+  const checkPermission = async () => {
+    const enabled = await firebase.messaging().hasPermission();
+    if (enabled) {
+      getToken();
+    } else {
+      requestPermission();
+    }
+  };
+
+  //3
+  const getToken = async () => {
+    console.log('getting token');
+    let fcmToken = await AsyncStorage.getItem('fcmToken');
+    console.log(fcmToken);
+    if (!fcmToken) {
+      fcmToken = await firebase.messaging().getToken();
+      if (fcmToken) {
+        // user has a device token
+        console.log(fcmToken);
+        await AsyncStorage.setItem('fcmToken', fcmToken);
+      }
+    }
+  };
+
+  //2
+  const requestPermission = async () => {
+    try {
+      await firebase.messaging().requestPermission();
+      // User has authorised
+      getToken();
+    } catch (error) {
+      // User has rejected permissions
+      console.log('permission rejected');
+    }
+  };
+
+  const messageListener = async () => {
+    firebase.notifications().onNotification(notification => {
+      const {title, body} = notification;
+      showAlert(title, body);
+    });
+
+    // firebase.notifications().onNotificationOpened(notificationOpen => {
+    //   const {title, body} = notificationOpen.notification;
+    //   showAlert(title, body);
+    // });
+
+    const notificationOpen = await firebase
+      .notifications()
+      .getInitialNotification();
+    if (notificationOpen) {
+      const {title, body} = notificationOpen.notification;
+      showAlert(title, body);
+    }
+
+    firebase.messaging().onMessage(message => {
+      console.log(JSON.stringify(message));
+    });
+  };
+
+  const showAlert = (title, message) => {
+    Alert.alert(
+      title,
+      message,
+      [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+      {cancelable: false},
+    );
   };
   const Layout = createRootNavigator(signedIn);
   return !checkedSignIn ? null : (
@@ -64,44 +141,5 @@ const App: () => React$Node = () => {
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
-  },
-  engine: {
-    position: 'absolute',
-    right: 0,
-  },
-  body: {
-    backgroundColor: Colors.white,
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-});
 
 export default App;

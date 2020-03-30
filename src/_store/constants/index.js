@@ -3,6 +3,7 @@ export const AUTHCONSTANTS = {
   LOGIN: 'LOGIN',
   LOGIN_ERROR: 'LOGIN_ERROR',
   LOGOUT: 'LOGOUT',
+  SIGNUP: 'SIGNUP',
 };
 
 export const USERCONSTANTS = {
