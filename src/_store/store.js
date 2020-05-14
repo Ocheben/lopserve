@@ -14,6 +14,7 @@ const persistConfig = {
   // Storage Method (React Native)
   storage: AsyncStorage,
   stateReconciler: autoMergeLevel2,
+  timeout: null,
   // Whitelist (Save Specific Reducers)
   // whitelist: ['userInfo'],
   // Blacklist (Don't Save Specific Reducers)

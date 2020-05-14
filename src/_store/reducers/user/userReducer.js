@@ -8,11 +8,13 @@ const {
   SET_ACC_BAL,
   SET_OFFICER,
   SET_MISSING,
+  SET_ORDERS,
 } = USERCONSTANTS;
 const {LOGOUT} = AUTHCONSTANTS;
 
 const initState = {
   loading: '',
+  orders: [],
   rates: {},
   dashboard: {user: '', totalContributionsThisYear: '', lastContribution: {}},
   contributions: [],
@@ -28,6 +30,12 @@ const userData = (state = initState, action) => {
       return {
         ...state,
         loading: action.payload,
+      };
+
+    case SET_ORDERS:
+      return {
+        ...state,
+        orders: action.payload,
       };
     case SET_DASHBOARD:
       const ratesAr = JSON.parse(action.payload.employment.contribution_rates);

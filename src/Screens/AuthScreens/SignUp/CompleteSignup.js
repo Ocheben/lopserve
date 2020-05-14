@@ -94,7 +94,7 @@ const CompleteSignup = props => {
         resetScrollToCoords={{x: 0, y: 0}}
         contentContainerStyle={{flexGrow: 1, width: width}}>
         <View>
-          <StatusBar backgroundColor={colors.dark} barStyle="light-content" />
+          <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
           <View style={{alignItems: 'center', marginTop: 30}}>
             <Content flex={1}>
               <LogoImg source={logo} width={width * 0.5} resizeMode="contain" />

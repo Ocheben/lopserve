@@ -10,10 +10,11 @@ import {
   Dimensions,
   PermissionsAndroid,
 } from 'react-native';
-import {Item} from 'native-base';
+import {Item, Label, Input} from 'native-base';
 import MapView from 'react-native-maps';
 import {Marker} from 'react-native-maps';
 import RNGooglePlaces from 'react-native-google-places';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {Content, SText, StyledButton, colors} from './styledComponents';
 
 const {height, width} = Dimensions.get('window');
@@ -22,9 +23,11 @@ const MapModal = ({isOpen, closeModal, selectLocation, name, id}) => {
   const [mapReady, setMapReady] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const [location, setLocation] = useState({});
+  const [phone, setPhone] = useState('');
+  const [landmark, setLandmark] = useState('');
   const [region, setRegion] = useState({
-    latitude: 37.78825,
-    longitude: -122.4324,
+    latitude: 9.0765,
+    longitude: 7.3986,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
@@ -90,7 +93,7 @@ const MapModal = ({isOpen, closeModal, selectLocation, name, id}) => {
         console.log(place);
         setLocation(prev => ({
           ...prev,
-          address: place.address,
+          address: `${place.name}, ${place.address}`,
           coordinates: place.location,
         }));
         setRegion(prev => ({
@@ -115,7 +118,7 @@ const MapModal = ({isOpen, closeModal, selectLocation, name, id}) => {
   };
 
   const onSelectLocation = () => {
-    selectLocation(location, id);
+    selectLocation(location, landmark, phone, id);
     setMapOpen(false);
   };
   return (
@@ -140,69 +143,101 @@ const MapModal = ({isOpen, closeModal, selectLocation, name, id}) => {
         onRequestClose={() => {
           Alert.alert('Modal has been closed.');
         }}>
-        <MapView
-          style={{height: height * 0.7, width}}
-          showsUserLocation={true}
-          followsUserLocation={true}
-          initialRegion={region}
-          region={region}
-          loadingEnabled>
-          {mapReady && (
-            <Marker
-              draggable
-              coordinate={{
-                latitude: region.latitude,
-                longitude: region.longitude,
-              }}
-              onDragEnd={e => dragMarker(e.nativeEvent.coordinate)}
-            />
-          )}
-        </MapView>
-        <Content align="center" width="100%">
-          <View style={{width: '95%', marginTop: 20}}>
-            <Item>
-              <Content align="flex-start" bmargin={5}>
-                <TouchableOpacity onPress={() => setSearch()}>
-                  <SText
-                    color="#555555"
-                    sixe="14px"
-                    width={width * 0.9}
-                    numberOfLines={1}>
-                    {location.address || 'Search'}
-                  </SText>
-                </TouchableOpacity>
-              </Content>
-            </Item>
-          </View>
-          <Content
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              width: '85%',
-              justifyContent: 'space-between',
-            }}>
-            <StyledButton
-              bg={colors.dark}
-              curved
-              width="40%"
-              height={45}
-              onPress={() => setMapOpen(false)}>
-              <SText size="16px" weight="700" color="#ffffff">
-                Cancel
-              </SText>
-            </StyledButton>
-            <StyledButton
-              curved
-              bg={colors.primary}
-              width="45%"
-              height={45}
-              onPress={() => onSelectLocation(location)}>
-              <SText size="16px" weight="700" color="#ffffff">
-                Select Location
-              </SText>
-            </StyledButton>
+        <KeyboardAwareScrollView
+          resetScrollToCoords={{x: 0, y: 0}}
+          contentContainerStyle={{flexGrow: 1, width: width}}>
+          <MapView
+            style={{height: height * 0.6, width}}
+            showsUserLocation={true}
+            followsUserLocation={true}
+            initialRegion={region}
+            region={region}
+            loadingEnabled>
+            {mapReady && (
+              <Marker
+                draggable
+                coordinate={{
+                  latitude: region.latitude,
+                  longitude: region.longitude,
+                }}
+                onDragEnd={e => dragMarker(e.nativeEvent.coordinate)}
+              />
+            )}
+          </MapView>
+          <Content align="center" width="100%">
+            <View style={{width: '95%', marginTop: 20}}>
+              <Item>
+                <Content align="flex-start" bmargin={5}>
+                  <TouchableOpacity onPress={() => setSearch()}>
+                    <SText
+                      color="#555555"
+                      sixe="14px"
+                      width={width * 0.9}
+                      numberOfLines={1}>
+                      {location.address || 'Address'}
+                    </SText>
+                  </TouchableOpacity>
+                </Content>
+              </Item>
+            </View>
+            <View style={{width: '95%', marginTop: 10}}>
+              <Item floatingLabel>
+                {/* <AtIcon color={colors.primary} size={30} /> */}
+                <Label>Landmark</Label>
+                <Input
+                  placeholder="Landmark"
+                  keyboardType="default"
+                  textContentType="addressCity"
+                  style={{color: '#444444'}}
+                  onChangeText={text => setLandmark(text)}
+                  value={landmark}
+                />
+              </Item>
+            </View>
+            <View style={{width: '95%', marginTop: 10}}>
+              <Item floatingLabel>
+                {/* <AtIcon color={colors.primary} size={30} /> */}
+                <Label>Phone</Label>
+                <Input
+                  placeholder="Phone"
+                  keyboardType="number-pad"
+                  textContentType="telephoneNumber"
+                  style={{color: '#444444'}}
+                  onChangeText={text => setPhone(text)}
+                  value={phone}
+                />
+              </Item>
+            </View>
+            <Content
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                width: '85%',
+                justifyContent: 'space-between',
+              }}>
+              <StyledButton
+                bg={colors.dark}
+                curved
+                width="40%"
+                height={45}
+                onPress={() => setMapOpen(false)}>
+                <SText size="16px" weight="700" color="#ffffff">
+                  Cancel
+                </SText>
+              </StyledButton>
+              <StyledButton
+                curved
+                bg={colors.primary}
+                width="45%"
+                height={45}
+                onPress={() => onSelectLocation(location)}>
+                <SText size="16px" weight="700" color="#ffffff">
+                  Select Location
+                </SText>
+              </StyledButton>
+            </Content>
           </Content>
-        </Content>
+        </KeyboardAwareScrollView>
       </Modal>
     </>
   );

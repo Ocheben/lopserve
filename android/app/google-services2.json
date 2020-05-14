@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "218538595731",
+    "firebase_url": "https://push-demo-i.firebaseio.com",
+    "project_id": "push-demo-i",
+    "storage_bucket": "push-demo-i.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:218538595731:android:4584df1020bb1d39814466",
+        "android_client_info": {
+          "package_name": "com.lopserve"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "218538595731-hj3mht5bhnl1b09nvdjnevslpstccn0f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lopserve",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "218538595731-b4fq74tq0o3pkk7jc5eqil3mhfp2iilj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIOUgkLE93PjqtOcIvkdNM-nwRDCPbDYo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "218538595731-b4fq74tq0o3pkk7jc5eqil3mhfp2iilj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

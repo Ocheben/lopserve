@@ -25,9 +25,8 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import {Root} from 'native-base';
+import {NavigationContainer} from '@react-navigation/native';
 import SplashScreen from 'react-native-splash-screen';
-import AsyncStorage from '@react-native-community/async-storage';
-import firebase from 'react-native-firebase';
 
 import {PersistGate} from 'redux-persist/integration/react';
 import {Provider} from 'react-redux';
@@ -36,8 +35,7 @@ import {store, persistor} from './src/_store/store';
 
 import {isSignedIn} from './src/_services';
 import {createRootNavigator} from './src/router';
-
-import PushController from './src/Components/PushController';
+import {checkPermission} from './src/_services/firebase';
 
 const App: () => React$Node = () => {
   const [signedIn, setSignedIn] = useState(false);
@@ -47,7 +45,6 @@ const App: () => React$Node = () => {
     checkSignIn();
     SplashScreen.hide();
     checkPermission();
-    messageListener();
   }, []);
 
   const checkSignIn = () => {
@@ -59,82 +56,15 @@ const App: () => React$Node = () => {
       .catch(err => alert('An error occurred', err));
   };
 
-  //1
-  const checkPermission = async () => {
-    const enabled = await firebase.messaging().hasPermission();
-    if (enabled) {
-      getToken();
-    } else {
-      requestPermission();
-    }
-  };
-
-  //3
-  const getToken = async () => {
-    console.log('getting token');
-    let fcmToken = await AsyncStorage.getItem('fcmToken');
-    console.log(fcmToken);
-    if (!fcmToken) {
-      fcmToken = await firebase.messaging().getToken();
-      if (fcmToken) {
-        // user has a device token
-        console.log(fcmToken);
-        await AsyncStorage.setItem('fcmToken', fcmToken);
-      }
-    }
-  };
-
-  //2
-  const requestPermission = async () => {
-    try {
-      await firebase.messaging().requestPermission();
-      // User has authorised
-      getToken();
-    } catch (error) {
-      // User has rejected permissions
-      console.log('permission rejected');
-    }
-  };
-
-  const messageListener = async () => {
-    firebase.notifications().onNotification(notification => {
-      const {title, body} = notification;
-      showAlert(title, body);
-    });
-
-    // firebase.notifications().onNotificationOpened(notificationOpen => {
-    //   const {title, body} = notificationOpen.notification;
-    //   showAlert(title, body);
-    // });
-
-    const notificationOpen = await firebase
-      .notifications()
-      .getInitialNotification();
-    if (notificationOpen) {
-      const {title, body} = notificationOpen.notification;
-      showAlert(title, body);
-    }
-
-    firebase.messaging().onMessage(message => {
-      console.log(JSON.stringify(message));
-    });
-  };
-
-  const showAlert = (title, message) => {
-    Alert.alert(
-      title,
-      message,
-      [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-      {cancelable: false},
-    );
-  };
   const Layout = createRootNavigator(signedIn);
   return !checkedSignIn ? null : (
     <>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <Root>
-            <Layout />
+            <NavigationContainer>
+              <Layout />
+            </NavigationContainer>
           </Root>
         </PersistGate>
       </Provider>

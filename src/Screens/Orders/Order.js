@@ -10,7 +10,6 @@ import {
   StatusBar,
   Modal,
 } from 'react-native';
-import messaging from '@react-native-firebase/messaging';
 import {Spinner, Toast} from 'native-base';
 import {
   Content,
@@ -20,71 +19,57 @@ import {
   StyledButton,
   colors,
 } from '../../Components/styledComponents';
-import {KekeIcon, PhoneIcon} from '../../Components/icons';
+import {
+  KekeIcon,
+  PhoneIcon,
+  GasCylinder,
+  PriceTagIcon,
+} from '../../Components/icons';
 import {Rating, GiveRating} from '../../Components/Components';
+import NumberFormat from 'react-number-format';
 import {APIS, requestJwt, toastDefault} from '../../_services';
+import {getOrders} from '../../_store/actions/userActions';
 
 const avatar = require('../../assets/img/avatar.png');
 const {height, width} = Dimensions.get('window');
 
-const Rider = ({navigation, userInfo}) => {
+const statusColors = ['#ff1744', colors.primary, '#1b5e20'];
+const statusMessages = ['Queued', 'In Progress', 'Delivered'];
+
+const OrderItem = ({navigation, userInfo, dispatch, userData}) => {
   const {token} = userInfo;
+  const {orders} = userData;
   const [loading, setLoading] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [rating, setRating] = useState(0);
   const [openRating, setOpenRating] = useState(false);
-  const vendorInfo = navigation.getParam('vendorInfo') || {};
-  useEffect(() => {
-    // messageListener();
-    const backAction = () => {
-      navigation.navigate('Home');
-      return true;
-    };
-
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
-    return () => backHandler.remove();
-  }, [navigation]);
-
-  // const messageListener = () => {
-  //   messaging().onNotificationOpenedApp(remoteMessage => {
-  //     console.log(
-  //       'Notification caused app to open from background state:',
-  //       remoteMessage.notification,
-  //     );
-  //   });
-
-  //   // Check whether an initial notification is available
-  //   messaging()
-  //     .getInitialNotification()
-  //     .then(remoteMessage => {
-  //       if (remoteMessage) {
-  //         console.log(
-  //           'Notification caused app to open from quit state:',
-  //           remoteMessage.notification,
-  //         );
-  //         navigation.navigate('Rider', {orderInfo: remoteMessage.data});
-  //       }
-  //     });
-  //   messaging().onMessage(message => {
-  //     console.log(JSON.stringify(message), message);
-  //   });
-  // };
-
+  const orderinfo = navigation.getParam('orderInfo');
+  console.log(orderInfo);
   const makeCall = () => {
     let phoneNumber = '';
     const androidPrefix = 'tel:${';
     const iosPrefix = 'telprompt:${';
 
     if (Platform.OS === 'android') {
-      phoneNumber = androidPrefix + vendorInfo.dealerphone + '}';
+      phoneNumber = androidPrefix + '09025605555' + '}';
     } else {
-      phoneNumber = iosPrefix + vendorInfo.dealerphone + '}';
+      phoneNumber = iosPrefix + '09025605555' + '}';
     }
 
     Linking.openURL(phoneNumber);
+  };
+
+  const selectedOrder =
+    orders.find(order => order.buyid === orderinfo.buyid) || {};
+  const orderInfo = {
+    ...selectedOrder,
+    date: selectedOrder.dateordered || '',
+    price: selectedOrder.price ? parseInt(selectedOrder.price, 10) : 0,
+    size: selectedOrder.buyingsize ? selectedOrder.buyingsize + ' kg' : '',
+    status:
+      selectedOrder.orderstatus && selectedOrder.orderstatus !== null
+        ? parseInt(selectedOrder.orderstatus, 10)
+        : 0,
   };
 
   const confirmOrder = async () => {
@@ -94,7 +79,7 @@ const Rider = ({navigation, userInfo}) => {
     } = APIS;
     const url = baseUrl + path;
     const payload = {
-      buyid: parseInt(vendorInfo.buyid, 10),
+      buyid: parseInt(orderInfo.buyid, 10),
       rating: parseInt(rating, 10),
     };
     setLoading(true);
@@ -109,6 +94,7 @@ const Rider = ({navigation, userInfo}) => {
       });
       setConfirmed(true);
       setOpenRating(false);
+      dispatch(getOrders(token));
     } else {
       Toast.show({
         ...toastDefault,
@@ -121,7 +107,7 @@ const Rider = ({navigation, userInfo}) => {
   return (
     <Content align="center" justify="space-between">
       <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
-      <Content flex={2}>
+      <Content flex={1}>
         <View style={styles.avatarContainer}>
           <LogoImg
             source={avatar}
@@ -132,39 +118,56 @@ const Rider = ({navigation, userInfo}) => {
           />
         </View>
         <SText size="32px" color="#333333" weight="700">
-          {vendorInfo.dealername}
+          {orderInfo.dealername || 'Lopserv'}
         </SText>
       </Content>
-      {/* <Content flex={1} horizontal>
-        <Content align="center" flex={1} height="100%" justify="space-between">
-          <SText color="#6d6e70" size="17px">
-            Vehicle type
-          </SText>
-          <Content justify="space-around">
-            <KekeIcon size="60px" />
-          </Content>
-        </Content>
-        <Content height="100%" justify="space-between">
-          <SText color="#6d6e70" size="17px">
-            License Number
-          </SText>
-          <Content justify="space-around">
-            <SText color="#444444" size="24px" weight="700">
-              KUJ 989 AG
-            </SText>
-          </Content>
-        </Content>
-      </Content> */}
       <Content justify="space-between">
-        <Rating size={35} rating={Math.round(vendorInfo.rating)} />
+        <Rating size={35} rating={4} />
         <Content horizontal>
           <PhoneIcon color="#6d6e70" size={20} />
           <SText hmargin={5} color="#6d6e70" size="17px">
-            {vendorInfo.dealerphone}
+            {orderInfo.dealerphone || '09025605555'}
           </SText>
         </Content>
+        <Content horizontal width="70%">
+          <Content horizontal justify="center">
+            <GasCylinder
+              size="20px"
+              color={colors.primary}
+              style={{marginRight: 10}}
+            />
+            <SText size="20px" color={colors.dark}>
+              {orderInfo.size}
+            </SText>
+          </Content>
+          <Content horizontal justify="center">
+            <PriceTagIcon
+              size="20px"
+              color={colors.primary}
+              style={{marginRight: 10}}
+            />
+            <NumberFormat
+              value={parseInt(orderInfo.totalprice || 0, 10)}
+              displayType={'text'}
+              thousandSeparator={true}
+              prefix={'\u20A6'}
+              renderText={value => (
+                <SText size="20px" color={colors.dark}>
+                  {value}
+                </SText>
+              )}
+            />
+          </Content>
+        </Content>
+        <SText
+          size="25px"
+          weight="700"
+          bmargin={10}
+          color={statusColors[orderInfo.status]}>
+          {statusMessages[orderInfo.status]}
+        </SText>
       </Content>
-      <Content horizontal align="flex-end" justify="space-between">
+      <ContentB horizontal align="flex-end" justify="space-between">
         <StyledButton
           bg={colors.primary}
           width="50%"
@@ -177,12 +180,12 @@ const Rider = ({navigation, userInfo}) => {
           bg="#00a651"
           width="50%"
           onPress={() => setOpenRating(true)}
-          disabled={confirmed}>
+          disabled={confirmed || orderInfo.status !== 1}>
           <SText size="20px" weight="700" color="#ffffff">
             CONFIRM
           </SText>
         </StyledButton>
-      </Content>
+      </ContentB>
       <Modal animationType="slide" transparent visible={openRating}>
         <Content bg="#00000022" onPress={() => setOpenRating(false)}>
           <ContentB bg="#ffffff" height={height * 0.4} width="70%" borderR={5}>
@@ -193,7 +196,7 @@ const Rider = ({navigation, userInfo}) => {
             <StyledButton
               bg="#00a651"
               width="50%"
-              disabled={confirmed}
+              disabled={confirmed || orderInfo.status !== 1}
               curved
               height={50}
               tmargin={35}
@@ -236,4 +239,4 @@ const mapStateToProps = state => ({
   userData: state.userData,
 });
 
-export default connect(mapStateToProps)(Rider);
+export default connect(mapStateToProps)(OrderItem);

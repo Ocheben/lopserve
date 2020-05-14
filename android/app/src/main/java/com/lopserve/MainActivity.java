@@ -7,7 +7,7 @@ import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 
 import org.devio.rn.splashscreen.SplashScreen; // Import this.
 import android.os.Bundle; // Import this.
-import com.reactlibrary.RNGooglePlacePickerPackage;
+// import com.reactlibrary.RNGooglePlacePickerPackage;
 
 public class MainActivity extends ReactActivity {
 

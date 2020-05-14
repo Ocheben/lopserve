@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {connect} from 'react-redux';
 import {Dimensions, View, StatusBar} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import NumberFormat from 'react-number-format';
 import {WebView} from 'react-native-webview';
 import {
   List,
@@ -14,7 +15,6 @@ import {
   Input,
 } from 'native-base';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import RNGooglePlacePicker from 'react-native-google-place-picker';
 import RNGooglePlaces from 'react-native-google-places';
 import MapView from 'react-native-maps';
 import {Marker} from 'react-native-maps';
@@ -33,12 +33,15 @@ import MapModal from '../../Components/MapModal';
 
 const {height, width} = Dimensions.get('window');
 
+const serviceFee = 600;
 const RequestGas = props => {
   const {navigation, dispatch, userInfo, userData} = props;
   const {cylinders, unitprice} = userInfo;
-  const cylinderSize =
-    cylinders.find(e => e.id === navigation.getParam('cylinderSize')).size ||
-    '12';
+  const cylinderSize = navigation.getParam('cylinderSize') || 0;
+  const cylinderList = [...Array(cylinderSize + 1).keys()].splice(1);
+  // cylinders.find(e => e.id === navigation.getParam('cylinderSize')).size ||
+  // '12';
+  const buyCylinder = navigation.getParam('buyCylinder');
   const [formInputs, setFormInputs] = useState({});
   const [loading, setLoading] = useState(false);
   const [location, setLocation] = useState({});
@@ -56,67 +59,22 @@ const RequestGas = props => {
   }, [cylinderSize]);
 
   const setGasSize = value => {
-    const gasSize = cylinders.find(e => e.id === value).size.slice(0, 1);
-    console.log(gasSize);
-    const cost = parseInt(gasSize || 0, 10) * parseInt(unitprice, 10);
-    setFormInputs(prev => ({...prev, gasSize: value, total: cost.toString()}));
+    const cost = parseInt(value || 0, 10) * parseFloat(unitprice).toFixed(2);
+    setFormInputs(prev => ({
+      ...prev,
+      gasSize: value,
+      total: cost.toString(),
+    }));
   };
 
-  const setPickup = () => {
-    // RNGooglePlacePicker.show(response => {
-    //   if (response.didCancel) {
-    //     console.log('User cancelled GooglePlacePicker');
-    //   } else if (response.error) {
-    //     console.log('GooglePlacePicker Error: ', response.error);
-    //   } else {
-    //     setLocation(response);
-    //   }
-    // });
-    RNGooglePlaces.openAutocompleteModal(
-      {
-        country: 'NG',
-        type: 'establishment',
-      },
-      ['name', 'location', 'address'],
-    )
-      .then(place => {
-        console.log(place);
-        setFormInputs(prev => ({
-          ...prev,
-          pickupAddress: place.address,
-          pickupLocation: place.location,
-        }));
-        // place represents user's selection from the
-        // suggestions and it is a simplified Google Place object.
-      })
-      .catch(error => console.log(error.message)); // error is a Javascript Error object
-  };
-
-  const setDelivery = () => {
-    RNGooglePlaces.openAutocompleteModal(
-      {
-        country: 'NG',
-        type: 'establishment',
-      },
-      ['name', 'location', 'address'],
-    )
-      .then(place => {
-        console.log(place);
-        setFormInputs(prev => ({
-          ...prev,
-          deliveryAddress: place.address,
-          deliveryLocation: place.location,
-        }));
-      })
-      .catch(error => console.log(error.message));
-  };
-
-  const onSelectLocation = (selectedLocation, id) => {
+  const onSelectLocation = (selectedLocation, landmark, phone, id) => {
     console.log(selectedLocation, id);
     setFormInputs(prev => ({
       ...prev,
       [`${id}Address`]: selectedLocation.address,
       [`${id}Location`]: selectedLocation.coordinates,
+      [`${id}Landmark`]: landmark,
+      [`${id}Phone`]: phone,
     }));
   };
 
@@ -126,10 +84,11 @@ const RequestGas = props => {
         resetScrollToCoords={{x: 0, y: 0}}
         contentContainerStyle={{flexGrow: 1, width: width}}>
         <View>
-          <StatusBar
+          {/* <StatusBar
             backgroundColor={colors.primary}
             barStyle="light-content"
-          />
+          /> */}
+          <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
           <View style={{alignItems: 'center', marginTop: 30}}>
             <Content width="90%" vmargin={10} flex={0} align="flex-start">
               <SText color="#777777" size="15px">
@@ -139,7 +98,7 @@ const RequestGas = props => {
                 <Input
                   name="current_age"
                   keyboardType="number-pad"
-                  value={formInputs.cylinderSize}
+                  value={`${formInputs.cylinderSize} Kg`}
                   disabled
                   onChangeText={text =>
                     setFormInputs(prev => ({...prev, cylinderSize: text}))
@@ -162,20 +121,16 @@ const RequestGas = props => {
                   selectedValue={formInputs.gasSize || null}
                   onValueChange={value => setGasSize(value)}>
                   <Picker.Item label="Select Gas" value={null} />
-                  {cylinders.map(item => (
-                    <Picker.Item
-                      label={item.size}
-                      key={item.id}
-                      value={item.id}
-                    />
+                  {cylinderList.map(item => (
+                    <Picker.Item label={`${item} Kg`} key={item} value={item} />
                   ))}
                 </Picker>
               </Item>
             </Content>
             <Content width="90%" vmargin={10} flex={0} align="center">
-              <Item floatingLabel>
-                <Label>Total</Label>
-                <Input
+              <Item>
+                {/* <Label>Total</Label> */}
+                {/* <Input
                   name="total"
                   keyboardType="number-pad"
                   value={formInputs.total || ' '}
@@ -183,7 +138,36 @@ const RequestGas = props => {
                   onChangeText={text =>
                     setFormInputs(prev => ({...prev, total: text}))
                   }
-                />
+                /> */}
+                <Content align="flex-start" bmargin={5}>
+                  <SText color="#777777" size="15px" bmargin={10}>
+                    Total
+                  </SText>
+                  <NumberFormat
+                    value={parseInt(formInputs.total, 10)}
+                    displayType={'text'}
+                    thousandSeparator={true}
+                    prefix={'\u20A6'}
+                    renderText={value => (
+                      <SText color="#333333" bmargin={5} size="18px">
+                        {value}
+                        {' + '}
+                        <NumberFormat
+                          value={serviceFee}
+                          displayType={'text'}
+                          thousandSeparator={true}
+                          prefix={'\u20A6'}
+                          renderText={value => (
+                            <SText color="#333333" bmargin={5} size="18px">
+                              {value}
+                            </SText>
+                          )}
+                        />
+                        {' (Delivery)'}
+                      </SText>
+                    )}
+                  />
+                </Content>
               </Item>
             </Content>
             <Content
@@ -240,7 +224,20 @@ const RequestGas = props => {
           <StyledButton
             bg={colors.primary}
             width="100%"
-            onPress={() => navigation.navigate('Pay', {inputs: formInputs})}>
+            disabled={
+              !(parseInt(formInputs.total, 10) > 0) ||
+              !formInputs.pickupLocation ||
+              !formInputs.deliveryLocation
+            }
+            onPress={() =>
+              navigation.navigate('Pay', {
+                inputs: {
+                  ...formInputs,
+                  total: parseInt(formInputs.total, 10) + serviceFee,
+                  buyCylinder,
+                },
+              })
+            }>
             {loading ? (
               <Spinner color="#ffffff" />
             ) : (
@@ -258,6 +255,10 @@ const RequestGas = props => {
 const mapStateToProps = state => ({
   userInfo: state.userInfo,
   userData: state.userData,
+});
+
+RequestGas.navigationOptions = () => ({
+  tabBarVisible: false,
 });
 
 export default connect(mapStateToProps)(RequestGas);

@@ -111,7 +111,7 @@ const SignUp = props => {
         alignItems: 'center',
       }}>
       {/* <View style={{width: '100%'}}> */}
-      <StatusBar backgroundColor={colors.dark} barStyle="light-content" />
+      <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
       {/* <View style={{alignItems: 'center', marginTop: 30}}> */}
       <Content flex={0}>
         <LogoImg source={logo} width={width * 0.5} resizeMode="contain" />
@@ -146,6 +146,7 @@ const SignUp = props => {
               curved
               bg={colors.primary}
               width="40%"
+              shadow
               onPress={() => verifyOtp()}>
               {loading ? (
                 <Spinner color="#ffffff" />
@@ -190,6 +191,7 @@ const SignUp = props => {
             <StyledButton
               curved
               bg={colors.primary}
+              shadow
               width="40%"
               onPress={() => initSignup()}>
               {loading ? (

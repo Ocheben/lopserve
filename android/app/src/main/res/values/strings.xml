@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Lopserve</string>
+    <string name="app_name">Lopserv</string>
     <string name="maps_key">AIzaSyCakXn8VvuHq9CIju0OLAdIrBuQNxG2YK0</string>
     <string name="default_notification_channel_id">218538595731</string>
 </resources>
