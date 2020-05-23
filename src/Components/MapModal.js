@@ -183,9 +183,9 @@ const MapModal = ({isOpen, closeModal, selectLocation, name, id}) => {
             <View style={{width: '95%', marginTop: 10}}>
               <Item floatingLabel>
                 {/* <AtIcon color={colors.primary} size={30} /> */}
-                <Label>Landmark</Label>
+                <Label>Landmark (optional)</Label>
                 <Input
-                  placeholder="Landmark"
+                  placeholder="Landmark (optional)"
                   keyboardType="default"
                   textContentType="addressCity"
                   style={{color: '#444444'}}
@@ -197,9 +197,9 @@ const MapModal = ({isOpen, closeModal, selectLocation, name, id}) => {
             <View style={{width: '95%', marginTop: 10}}>
               <Item floatingLabel>
                 {/* <AtIcon color={colors.primary} size={30} /> */}
-                <Label>Phone</Label>
+                <Label>Phone (optional)</Label>
                 <Input
-                  placeholder="Phone"
+                  placeholder="Phone (optional)"
                   keyboardType="number-pad"
                   textContentType="telephoneNumber"
                   style={{color: '#444444'}}

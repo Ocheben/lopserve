@@ -47,7 +47,7 @@ const ChangePassword = props => {
       baseUrl,
       changePassword: {method, path},
     } = APIS;
-    const submitUrl = `${baseUrl}${path}`;
+    const submitUrl = `${path}`;
 
     setLoading(true);
     const data = {

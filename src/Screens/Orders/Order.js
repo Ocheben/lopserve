@@ -122,7 +122,7 @@ const OrderItem = ({navigation, userInfo, dispatch, userData}) => {
         </SText>
       </Content>
       <Content justify="space-between">
-        <Rating size={35} rating={4} />
+        <Rating size={35} rating={Math.round(orderInfo.rating)} />
         <Content horizontal>
           <PhoneIcon color="#6d6e70" size={20} />
           <SText hmargin={5} color="#6d6e70" size="17px">

@@ -18,7 +18,11 @@ export const APIS = {
   },
   changePassword: {
     method: 'PUT',
-    path: 'https://lopserv.herokuapp.com/lopser/dealer/v1/auth/password',
+    path: 'https://lopserv.herokuapp.com/lopser/v1/auth/password',
+  },
+  editProfile: {
+    method: 'PUT',
+    path: '/auth/profile',
   },
   sendRequest: {
     method: 'POST',

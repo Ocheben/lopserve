@@ -74,8 +74,8 @@ const Profile = props => {
           </SText>
         </Content>
       </Content>
-      <Content flex={2} justify="center" width="90%" horizontal>
-        {/* <StyledButton
+      <Content flex={2} justify="space-between" width="90%" horizontal>
+        <StyledButton
           curved
           shadow
           bg={colors.primary}
@@ -87,7 +87,7 @@ const Profile = props => {
               Edit Profile
             </SText>
           </Content>
-        </StyledButton> */}
+        </StyledButton>
         <StyledButton
           curved
           shadow
