@@ -30,13 +30,76 @@ const logo = require('../../../assets/img/logo.png');
 const SignUp = props => {
   const {navigation, dispatch, userInfo} = props;
   const [loading, setLoading] = useState(false);
-  const [rsaPin, setRsaPin] = useState('');
-  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [phone, setPhone] = useState('');
   const [sentRsa, setSentRsa] = useState(false);
   const [sentPhone, setSentPhone] = useState(false);
   const signIn = async user => {
     await onSignIn(user);
     navigation.navigate('SignedIn');
+  };
+
+  const initSignup = async () => {
+    // navigation.navigate('SignedIn');
+    const {
+      baseUrl,
+      initSignup: {method, path},
+    } = APIS;
+    console.log(path);
+    const submitUrl = `${baseUrl}${path}`;
+
+    setLoading(true);
+    const response = await request(method, submitUrl, {phone});
+    console.log(response, method, submitUrl, phone);
+    if (response.meta && response.meta.status === 200) {
+      Toast.show({
+        ...toastDefault,
+        text: `OTP has been sent to ${phone}`,
+        type: 'success',
+      });
+      setSentPhone(true);
+      // dispatch(login({...response, isLoggedin: true}));
+      // await signIn(JSON.stringify(response));
+    } else {
+      Toast.show({
+        ...toastDefault,
+        text: response.meta ? response.meta.message : 'An error occurred',
+        type: 'danger',
+      });
+    }
+    setLoading(false);
+  };
+
+  const verifyOtp = async () => {
+    // navigation.navigate('SignedIn');
+    const {
+      baseUrl,
+      verifyOtp: {method, path},
+    } = APIS;
+    console.log(path);
+    const submitUrl = `${baseUrl}${path}`;
+
+    setLoading(true);
+    const response = await request(method, submitUrl, {phone, otp});
+    console.log(response, method, submitUrl, phone, otp);
+    if (response.meta && response.meta.status === 200) {
+      Toast.show({
+        ...toastDefault,
+        text: 'OTP verified',
+        type: 'success',
+      });
+      setSentPhone(true);
+      navigation.navigate('CompleteSignup', {phone});
+      // dispatch(login({...response, isLoggedin: true}));
+      // await signIn(JSON.stringify(response));
+    } else {
+      Toast.show({
+        ...toastDefault,
+        text: response.meta ? response.meta.message : 'An error occurred',
+        type: 'danger',
+      });
+    }
+    setLoading(false);
   };
 
   return (
@@ -48,7 +111,7 @@ const SignUp = props => {
         alignItems: 'center',
       }}>
       {/* <View style={{width: '100%'}}> */}
-      <StatusBar backgroundColor={colors.dark} barStyle="light-content" />
+      <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
       {/* <View style={{alignItems: 'center', marginTop: 30}}> */}
       <Content flex={0}>
         <LogoImg source={logo} width={width * 0.5} resizeMode="contain" />
@@ -67,10 +130,8 @@ const SignUp = props => {
                 floatingLabel
                 placeholder="OTP"
                 keyboardType="numeric"
-                textContentType="password"
-                secureTextEntry
                 style={{color: '#444444'}}
-                onChangeText={text => setRsaPin(text)}
+                onChangeText={text => setOtp(text)}
               />
             </Item>
             <SText color="#444444" size="14px">
@@ -85,14 +146,18 @@ const SignUp = props => {
               curved
               bg={colors.primary}
               width="40%"
-              onPress={() => navigation.navigate('CompleteSignup')}>
+              shadow
+              onPress={() => verifyOtp()}>
               {loading ? (
                 <Spinner color="#ffffff" />
               ) : (
                 <NextIcon color="#ffffff" size={30} />
               )}
             </StyledButton>
-            <StyledButton width="auto" height="auto">
+            <StyledButton
+              width="auto"
+              height="auto"
+              onPress={() => initSignup()}>
               <SText size="15px" weight="700" color={colors.primary}>
                 RESEND CODE
               </SText>
@@ -118,7 +183,7 @@ const SignUp = props => {
                 placeholder="Phone Number"
                 keyboardType="numeric"
                 style={{color: '#444444'}}
-                onChangeText={text => setRsaPin(text)}
+                onChangeText={text => setPhone(text)}
               />
             </Item>
           </Content>
@@ -126,8 +191,9 @@ const SignUp = props => {
             <StyledButton
               curved
               bg={colors.primary}
+              shadow
               width="40%"
-              onPress={() => setSentPhone(true)}>
+              onPress={() => initSignup()}>
               {loading ? (
                 <Spinner color="#ffffff" />
               ) : (

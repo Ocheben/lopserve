@@ -10,6 +10,7 @@ import {
 import {connect} from 'react-redux';
 import NumberFormat from 'react-number-format';
 import {onSignOut} from '../../_services';
+import {messageListener} from '../../_services/firebase';
 import {getDash} from '../../_store/actions/userActions';
 import {
   SText,
@@ -24,28 +25,30 @@ import {Spinner, Item, Picker, Icon, CheckBox, Body} from 'native-base';
 import {Advert} from '../../Components/Components';
 
 const {height, width} = Dimensions.get('window');
-const ad = require('../../assets/img/ad.png');
+const ad = require('../../assets/img/ad.jpg');
 
 const Home = props => {
   const {navigation, dispatch, userInfo, userData} = props;
-  const [cylinder, setCylinder] = useState('');
+  const [cylinder, setCylinder] = useState(null);
   const [buyCylinder, setBuyCylinder] = useState(false);
+  const cylinderList = [...Array(51).keys()].slice(1);
   const {
     loading,
     dashboard: {user, totalContributionsThisYear, lastContribution},
   } = userData;
+  const {cylinders, token} = userInfo;
+
+  useEffect(() => {
+    messageListener(navigation, dispatch, token);
+  }, [navigation]);
   const signOut = () => {
     onSignOut();
     navigation.navigate('SignedOut');
   };
 
-  useEffect(() => {
-    dispatch(getDash(userInfo.access_token));
-  }, []);
-
   return (
     <Content bg="#ffffff">
-      <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
+      <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
       <Content width="100%" bg={colors.primary} flex={4}>
         <Advert img={ad} header="AD" />
       </Content>
@@ -67,9 +70,9 @@ const Home = props => {
             selectedValue={cylinder}
             onValueChange={value => setCylinder(value)}>
             <Picker.Item label="Select Cylinder" value={null} />
-            <Picker.Item label="4kg" value="4" />
-            <Picker.Item label="8kg" value="8" />
-            <Picker.Item label="12kg" value="12" />
+            {cylinderList.map(item => (
+              <Picker.Item label={`${item} Kg`} key={item} value={item} />
+            ))}
           </Picker>
         </Item>
         <Content horizontal justify="center">
@@ -83,12 +86,18 @@ const Home = props => {
           </SText>
         </Content>
       </Content>
-      <Content justify="flex-end" flex={2.5}>
+      <Content justify="center" flex={2.5}>
         <StyledButton
           bg={colors.primary}
-          width="100%"
+          curved
+          width="80%"
+          shadow
+          disabled={cylinder === null}
           onPress={() =>
-            navigation.navigate('RequestGas', {cylinderSize: cylinder})
+            navigation.navigate('RequestGas', {
+              cylinderSize: cylinder,
+              buyCylinder,
+            })
           }>
           <SText size="20px" weight="700" color="#ffffff">
             NEXT

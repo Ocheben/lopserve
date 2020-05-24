@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {connect} from 'react-redux';
 import {Dimensions, View, StatusBar} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import NumberFormat from 'react-number-format';
 import {WebView} from 'react-native-webview';
 import {
   List,
@@ -14,6 +15,9 @@ import {
   Input,
 } from 'native-base';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import RNGooglePlaces from 'react-native-google-places';
+import MapView from 'react-native-maps';
+import {Marker} from 'react-native-maps';
 import {onSignOut} from '../../_services';
 import {getContri} from '../../_store/actions/userActions';
 import {
@@ -25,22 +29,53 @@ import {
 } from '../../Components/styledComponents';
 import {NextIcon} from '../../Components/icons';
 import {RsaIcon} from '../../Components/Vectors';
+import MapModal from '../../Components/MapModal';
 
 const {height, width} = Dimensions.get('window');
 
+const serviceFee = 600;
 const RequestGas = props => {
   const {navigation, dispatch, userInfo, userData} = props;
-  const cylinderSize = navigation.getParam('cylinderSize') || '12';
+  const {cylinders, unitprice} = userInfo;
+  const cylinderSize = navigation.getParam('cylinderSize') || 0;
+  const cylinderList = [...Array(cylinderSize + 1).keys()].splice(1);
+  // cylinders.find(e => e.id === navigation.getParam('cylinderSize')).size ||
+  // '12';
+  const buyCylinder = navigation.getParam('buyCylinder');
   const [formInputs, setFormInputs] = useState({});
   const [loading, setLoading] = useState(false);
+  const [location, setLocation] = useState({});
+  const [mapReady, setMapReady] = useState(false);
+  const [region, setRegion] = useState({
+    latitude: 37.78825,
+    longitude: -122.4324,
+    latitudeDelta: 0.001,
+    longitudeDelta: 0.001,
+  });
 
   useEffect(() => {
     setFormInputs(prev => ({...prev, cylinderSize: cylinderSize}));
+    setMapReady(true);
   }, [cylinderSize]);
 
   const setGasSize = value => {
-    const cost = parseInt(value || 0, 10) * 300;
-    setFormInputs(prev => ({...prev, gasSize: value, total: cost.toString()}));
+    const cost = parseInt(value || 0, 10) * parseFloat(unitprice).toFixed(2);
+    setFormInputs(prev => ({
+      ...prev,
+      gasSize: value,
+      total: cost.toString(),
+    }));
+  };
+
+  const onSelectLocation = (selectedLocation, landmark, phone, id) => {
+    console.log(selectedLocation, id);
+    setFormInputs(prev => ({
+      ...prev,
+      [`${id}Address`]: selectedLocation.address,
+      [`${id}Location`]: selectedLocation.coordinates,
+      [`${id}Landmark`]: landmark,
+      [`${id}Phone`]: phone,
+    }));
   };
 
   return (
@@ -49,18 +84,21 @@ const RequestGas = props => {
         resetScrollToCoords={{x: 0, y: 0}}
         contentContainerStyle={{flexGrow: 1, width: width}}>
         <View>
-          <StatusBar
+          {/* <StatusBar
             backgroundColor={colors.primary}
             barStyle="light-content"
-          />
+          /> */}
+          <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
           <View style={{alignItems: 'center', marginTop: 30}}>
-            <Content width="90%" vmargin={10} flex={0} align="center">
-              <Item floatingLabel>
-                <Label>Gas Cylinder Size (kg)</Label>
+            <Content width="90%" vmargin={10} flex={0} align="flex-start">
+              <SText color="#777777" size="15px">
+                Gas Cylinder Size
+              </SText>
+              <Item>
                 <Input
                   name="current_age"
                   keyboardType="number-pad"
-                  value={formInputs.cylinderSize}
+                  value={`${formInputs.cylinderSize} Kg`}
                   disabled
                   onChangeText={text =>
                     setFormInputs(prev => ({...prev, cylinderSize: text}))
@@ -83,16 +121,16 @@ const RequestGas = props => {
                   selectedValue={formInputs.gasSize || null}
                   onValueChange={value => setGasSize(value)}>
                   <Picker.Item label="Select Gas" value={null} />
-                  <Picker.Item label="4kg" value="4" />
-                  <Picker.Item label="8kg" value="8" />
-                  <Picker.Item label="12kg" value="12" />
+                  {cylinderList.map(item => (
+                    <Picker.Item label={`${item} Kg`} key={item} value={item} />
+                  ))}
                 </Picker>
               </Item>
             </Content>
             <Content width="90%" vmargin={10} flex={0} align="center">
-              <Item floatingLabel>
-                <Label>Total</Label>
-                <Input
+              <Item>
+                {/* <Label>Total</Label> */}
+                {/* <Input
                   name="total"
                   keyboardType="number-pad"
                   value={formInputs.total || ' '}
@@ -100,7 +138,36 @@ const RequestGas = props => {
                   onChangeText={text =>
                     setFormInputs(prev => ({...prev, total: text}))
                   }
-                />
+                /> */}
+                <Content align="flex-start" bmargin={5}>
+                  <SText color="#777777" size="15px" bmargin={10}>
+                    Total
+                  </SText>
+                  <NumberFormat
+                    value={parseInt(formInputs.total, 10)}
+                    displayType={'text'}
+                    thousandSeparator={true}
+                    prefix={'\u20A6'}
+                    renderText={value => (
+                      <SText color="#333333" bmargin={5} size="18px">
+                        {value}
+                        {' + '}
+                        <NumberFormat
+                          value={serviceFee}
+                          displayType={'text'}
+                          thousandSeparator={true}
+                          prefix={'\u20A6'}
+                          renderText={value => (
+                            <SText color="#333333" bmargin={5} size="18px">
+                              {value}
+                            </SText>
+                          )}
+                        />
+                        {' (Delivery)'}
+                      </SText>
+                    )}
+                  />
+                </Content>
               </Item>
             </Content>
             <Content
@@ -109,13 +176,14 @@ const RequestGas = props => {
               flex={0}
               justify="flex-start"
               horizontal>
-              <Item floatingLabel>
+              {/* <Item floatingLabel>
                 <Label>Pickup Address</Label>
                 <Input
                   name="pickupAddress"
                   keyboardType="default"
                   textContentType="fullStreetAddress"
                   value={formInputs.pickupAddress || ''}
+                  onFocus={() => openLocation()}
                   onChangeText={text =>
                     setFormInputs(prev => ({
                       ...prev,
@@ -123,7 +191,20 @@ const RequestGas = props => {
                     }))
                   }
                 />
-              </Item>
+              </Item> */}
+            </Content>
+            <Content
+              width="90%"
+              vmargin={10}
+              bmargin={30}
+              flex={0}
+              justify="flex-start"
+              horizontal>
+              <MapModal
+                selectLocation={onSelectLocation}
+                name="Pickup Address"
+                id="pickup"
+              />
             </Content>
             <Content
               width="90%"
@@ -131,21 +212,11 @@ const RequestGas = props => {
               flex={0}
               justify="flex-start"
               horizontal>
-              <Item floatingLabel>
-                <Label>Delivery Address</Label>
-                <Input
-                  name="pickupAddress"
-                  keyboardType="default"
-                  textContentType="fullStreetAddress"
-                  value={formInputs.monthly_contribution || ''}
-                  onChangeText={text =>
-                    setFormInputs(prev => ({
-                      ...prev,
-                      monthly_contribution: text,
-                    }))
-                  }
-                />
-              </Item>
+              <MapModal
+                selectLocation={onSelectLocation}
+                name="Delivery Address"
+                id="delivery"
+              />
             </Content>
           </View>
         </View>
@@ -153,8 +224,19 @@ const RequestGas = props => {
           <StyledButton
             bg={colors.primary}
             width="100%"
+            disabled={
+              !(parseInt(formInputs.total, 10) > 0) ||
+              !formInputs.pickupLocation ||
+              !formInputs.deliveryLocation
+            }
             onPress={() =>
-              navigation.navigate('Pay', {amount: formInputs.total})
+              navigation.navigate('Pay', {
+                inputs: {
+                  ...formInputs,
+                  total: parseInt(formInputs.total, 10) + serviceFee,
+                  buyCylinder,
+                },
+              })
             }>
             {loading ? (
               <Spinner color="#ffffff" />
@@ -173,6 +255,10 @@ const RequestGas = props => {
 const mapStateToProps = state => ({
   userInfo: state.userInfo,
   userData: state.userData,
+});
+
+RequestGas.navigationOptions = () => ({
+  tabBarVisible: false,
 });
 
 export default connect(mapStateToProps)(RequestGas);

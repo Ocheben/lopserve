@@ -12,8 +12,10 @@ import {
   Picker,
   Label,
   Input,
+  Toast,
 } from 'native-base';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {onSignIn} from '../../../_services';
 import {
   SText,
   Content,
@@ -22,23 +24,68 @@ import {
   StyledButton,
   colors,
 } from '../../../Components/styledComponents';
+import {APIS, request, toastDefault} from '../../../_services';
+import {signup} from '../../../_store/actions/authActions';
 
 const {height, width} = Dimensions.get('window');
 const logo = require('../../../assets/img/logo.png');
 
 const CompleteSignup = props => {
   const {navigation, dispatch, userInfo, userData} = props;
-  const cylinderSize = navigation.getParam('cylinderSize') || '12';
+  const phone = navigation.getParam('phone');
   const [formInputs, setFormInputs] = useState({});
   const [loading, setLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('')
 
-  useEffect(() => {
-    setFormInputs(prev => ({...prev, cylinderSize: cylinderSize}));
-  }, [cylinderSize]);
+  // useEffect(() => {
+  //   setFormInputs(prev => ({...prev, cylinderSize: cylinderSize}));
+  // }, [cylinderSize]);
+  const signIn = async user => {
+    await onSignIn(user);
+    navigation.navigate('SignedIn');
+  };
 
   const setGasSize = value => {
     const cost = parseInt(value || 0, 10) * 300;
     setFormInputs(prev => ({...prev, gasSize: value, total: cost.toString()}));
+  };
+
+  const handleSubmit = async () => {
+    // navigation.navigate('SignedIn');
+    const {
+      baseUrl,
+      completeSignup: {method, path},
+    } = APIS;
+    console.log(path);
+    const submitUrl = `${baseUrl}${path}`;
+    if (confirmPassword === '' || confirmPassword !== formInputs.password) {
+      Toast.show({
+        ...toastDefault,
+        text: 'Password do not match',
+        type: 'danger',
+      });
+      return;
+    }
+    setLoading(true);
+    const response = await request(method, submitUrl, {...formInputs, phone});
+    console.log(response, method, submitUrl, {...formInputs, phone});
+    if (response.meta && response.meta.status === 200) {
+      Toast.show({
+        ...toastDefault,
+        text: 'You have successfully signed up',
+        type: 'success',
+      });
+      navigation.navigate('Login');
+      // dispatch(signup({...response, isLoggedin: true}));
+      // await signIn(JSON.stringify(response));
+    } else {
+      Toast.show({
+        ...toastDefault,
+        text: response.meta ? response.meta.message : 'An error occurred',
+        type: 'danger',
+      });
+    }
+    setLoading(false);
   };
 
   return (
@@ -47,7 +94,7 @@ const CompleteSignup = props => {
         resetScrollToCoords={{x: 0, y: 0}}
         contentContainerStyle={{flexGrow: 1, width: width}}>
         <View>
-          <StatusBar backgroundColor={colors.dark} barStyle="light-content" />
+          <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
           <View style={{alignItems: 'center', marginTop: 30}}>
             <Content flex={1}>
               <LogoImg source={logo} width={width * 0.5} resizeMode="contain" />
@@ -137,13 +184,8 @@ const CompleteSignup = props => {
                   keyboardType="default"
                   textContentType="password"
                   secureTextEntry
-                  value={formInputs.conformPassword || ''}
-                  onChangeText={text =>
-                    setFormInputs(prev => ({
-                      ...prev,
-                      confirmPassword: text,
-                    }))
-                  }
+                  value={confirmPassword || ''}
+                  onChangeText={text => setConfirmPassword(text)}
                 />
               </Item>
             </Content>
@@ -155,7 +197,7 @@ const CompleteSignup = props => {
             curved
             shadow
             width="90%"
-            onPress={() => navigation.navigate('SignedIn')}>
+            onPress={() => handleSubmit()}>
             {loading ? (
               <Spinner color="#ffffff" />
             ) : (

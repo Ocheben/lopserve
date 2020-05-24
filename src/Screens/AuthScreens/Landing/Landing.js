@@ -23,7 +23,7 @@ const slides = [
 const Landing = ({navigation}) => {
   return (
     <Content align="center" justify="space-between">
-      <StatusBar backgroundColor={colors.dark} barStyle="light-content" />
+      <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
       <Content flex={1}>
         <LogoImg source={logo} width={width * 0.7} resizeMode="contain" />
       </Content>
