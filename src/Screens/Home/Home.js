@@ -58,12 +58,12 @@ const Home = props => {
             Refill your Gas
           </SText>
         </Content>
-        <Item picker>
+        <Item picker style={{width: '100%'}}>
           {/* <Label>Preferred Response</Label> */}
           <Picker
             mode="dropdown"
             iosIcon={<Icon name="arrow-down" />}
-            style={{width: undefined}}
+            style={{width: '90%'}}
             placeholder="Select Cylinder"
             placeholderStyle={{color: '#bfc6ea'}}
             placeholderIconColor="#007aff"

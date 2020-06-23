@@ -9,6 +9,7 @@ import {
   Alert,
   Dimensions,
   PermissionsAndroid,
+  Platform
 } from 'react-native';
 import {Item, Label, Input} from 'native-base';
 import MapView from 'react-native-maps';
@@ -34,11 +35,15 @@ const MapModal = ({isOpen, closeModal, selectLocation, name, id}) => {
 
   useEffect(() => {
     setMapReady(true);
-    requestCameraPermission();
+    if (Platform.OS === 'ios') {
+      Geolocation.requestAuthorization();
+    } else {
+      requestLocationPermission();
+    }
     getUserLocation();
   }, []);
 
-  const requestCameraPermission = async () => {
+  const requestLocationPermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -149,7 +154,7 @@ const MapModal = ({isOpen, closeModal, selectLocation, name, id}) => {
           <MapView
             style={{height: height * 0.6, width}}
             showsUserLocation={true}
-            followsUserLocation={true}
+            // followsUserLocation={true}
             initialRegion={region}
             region={region}
             loadingEnabled>

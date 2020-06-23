@@ -31,7 +31,6 @@
     "react-native-gesture-handler": "^1.5.6",
     "react-native-google-places": "^3.1.2",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
-    "react-native-linear-gradient": "^2.5.6",
     "react-native-map-picker": "0.0.2",
     "react-native-maps": "^0.27.1",
     "react-native-paystack": "^3.4.0",

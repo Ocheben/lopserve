@@ -110,11 +110,11 @@ const RequestGas = props => {
               <SText color="#777777" size="15px">
                 Gas
               </SText>
-              <Item>
+              <Item picker style={{width: '100%'}}>
                 <Picker
                   mode="dropdown"
                   iosIcon={<Icon name="arrow-down" />}
-                  style={{width: undefined}}
+                  style={{width: '85%'}}
                   placeholder="Select Cylinder"
                   placeholderStyle={{color: '#bfc6ea'}}
                   placeholderIconColor="#007aff"

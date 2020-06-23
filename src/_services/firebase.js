@@ -5,6 +5,7 @@ import {Alert} from 'react-native';
 import {getOrders} from '../_store/actions/userActions';
 //1
 export const checkPermission = async () => {
+  // await messaging().registerDeviceForRemoteMessages();
   const enabled = await messaging().hasPermission();
   if (enabled) {
     getToken();

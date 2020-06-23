@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import {GradientView, SText, colors} from './styledComponents';
+import {SText, colors} from './styledComponents';
 import {GoldStar, NoStar} from './icons';
 
 const {height, width} = Dimensions.get('window');
@@ -16,13 +16,13 @@ export const Advert = ({img, header}) => (
     source={img}
     style={{height: '100%', width: '100%'}}
     resizeMode="cover">
-    <GradientView colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0)']}>
+    <View>
       <View style={{height: '20%', justifyContent: 'space-between'}}>
         <SText color={colors.primary} size="30px" weight="700">
           {header}
         </SText>
       </View>
-    </GradientView>
+    </View>
   </ImageBackground>
 );
 

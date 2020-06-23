@@ -34,7 +34,7 @@ const Landing = ({navigation}) => {
           delay={3000}
           indicatorOffset={0}
           inactiveIndicatorColor="#444444">
-          <Content>
+          <Content width={width}>
             <GasCylinder color={colors.primary} size={width * 0.4} />
             <SText color="#444444" size="32px" vmargin={10} weight="700">
               Buy Gas
@@ -43,7 +43,7 @@ const Landing = ({navigation}) => {
               Running out of gas? Request for cooking gas refill
             </SText>
           </Content>
-          <Content>
+          <Content width={width}>
             <GasCylinder color={colors.primary} size={width * 0.4} />
             <SText color="#444444" size="32px" vmargin={10} weight="700">
               We Pickup
@@ -53,7 +53,7 @@ const Landing = ({navigation}) => {
               take it to the gas station and refill it
             </SText>
           </Content>
-          <Content>
+          <Content width={width}>
             <GasCylinder color={colors.primary} size={width * 0.4} />
             <SText color="#444444" size="32px" vmargin={10} weight="700">
               Delivered
