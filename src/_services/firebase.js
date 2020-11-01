@@ -7,6 +7,7 @@ import {getOrders} from '../_store/actions/userActions';
 export const checkPermission = async () => {
   // await messaging().registerDeviceForRemoteMessages();
   const enabled = await messaging().hasPermission();
+  console.log(enabled);
   if (enabled) {
     getToken();
   } else {

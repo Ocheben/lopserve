@@ -31,7 +31,8 @@ const Home = props => {
   const {navigation, dispatch, userInfo, userData} = props;
   const [cylinder, setCylinder] = useState(null);
   const [buyCylinder, setBuyCylinder] = useState(false);
-  const cylinderList = [...Array(51).keys()].slice(1);
+  // const cylinderList = [...Array(51).keys()].slice(1);
+  const cylinderList = [3, 5, 6, 10, 12.5];
   const {
     loading,
     dashboard: {user, totalContributionsThisYear, lastContribution},
@@ -62,7 +63,7 @@ const Home = props => {
           {/* <Label>Preferred Response</Label> */}
           <Picker
             mode="dropdown"
-            iosIcon={<Icon name="arrow-down" />}
+            iosIcon={<Icon />}
             style={{width: '90%'}}
             placeholder="Select Cylinder"
             placeholderStyle={{color: '#bfc6ea'}}

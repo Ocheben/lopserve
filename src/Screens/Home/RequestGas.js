@@ -38,7 +38,14 @@ const RequestGas = props => {
   const {navigation, dispatch, userInfo, userData} = props;
   const {cylinders, unitprice} = userInfo;
   const cylinderSize = navigation.getParam('cylinderSize') || 0;
-  const cylinderList = [...Array(cylinderSize + 1).keys()].splice(1);
+  const cylinderList = [...Array(Math.floor(cylinderSize) + 1).keys()].splice(
+    1,
+  );
+  const cylinderPicker = [
+    ...cylinderList,
+    ...(cylinderSize - Math.floor(cylinderSize) !== 0 ? [cylinderSize] : []),
+  ];
+  // const cylinderList = [...Array(cylinderSize + 1).keys()].splice(1);
   // cylinders.find(e => e.id === navigation.getParam('cylinderSize')).size ||
   // '12';
   const buyCylinder = navigation.getParam('buyCylinder');
@@ -59,7 +66,7 @@ const RequestGas = props => {
   }, [cylinderSize]);
 
   const setGasSize = value => {
-    const cost = parseInt(value || 0, 10) * parseFloat(unitprice).toFixed(2);
+    const cost = parseFloat(value || 0) * parseFloat(unitprice).toFixed(2);
     setFormInputs(prev => ({
       ...prev,
       gasSize: value,
@@ -113,7 +120,8 @@ const RequestGas = props => {
               <Item picker style={{width: '100%'}}>
                 <Picker
                   mode="dropdown"
-                  iosIcon={<Icon name="arrow-down" />}
+                  iosIcon={<Icon />}
+                  // iosIcon={<Icon name="arrow-down" type="SimpleLineIcons" />}
                   style={{width: '85%'}}
                   placeholder="Select Cylinder"
                   placeholderStyle={{color: '#bfc6ea'}}
@@ -121,7 +129,7 @@ const RequestGas = props => {
                   selectedValue={formInputs.gasSize || null}
                   onValueChange={value => setGasSize(value)}>
                   <Picker.Item label="Select Gas" value={null} />
-                  {cylinderList.map(item => (
+                  {cylinderPicker.map(item => (
                     <Picker.Item label={`${item} Kg`} key={item} value={item} />
                   ))}
                 </Picker>
