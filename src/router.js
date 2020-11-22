@@ -61,6 +61,7 @@ const HomeStack = createStackNavigator(
             align="center"
             vmargin={10}
             bg="#ffffff"
+            bottomShadow
             height={height / 10}
             horizontal>
             <View style={{width: 40}} />
@@ -82,6 +83,10 @@ const HomeStack = createStackNavigator(
             </View>
           </Content>
         ),
+        headerStyle: {
+          backgroundColor: '#ffffff',
+        },
+        // headerTintColor: '#ffffff'
       }),
     },
     RequestGas: {
@@ -95,6 +100,7 @@ const HomeStack = createStackNavigator(
             align="center"
             vmargin={10}
             bg="#ffffff"
+            bottomShadow
             height={height / 10}
             horizontal>
             <TouchableOpacity
@@ -125,6 +131,7 @@ const HomeStack = createStackNavigator(
             align="center"
             vmargin={10}
             bg="#ffffff"
+            bottomShadow
             height={height / 10}
             horizontal>
             <TouchableOpacity
@@ -155,6 +162,7 @@ const HomeStack = createStackNavigator(
             align="center"
             vmargin={10}
             bg="#ffffff"
+            bottomShadow
             height={height / 10}
             horizontal>
             <TouchableOpacity
@@ -193,6 +201,7 @@ const ProfileStack = createStackNavigator(
             justify="space-between"
             hpadding={12}
             align="center"
+            bottomShadow
             bg="#ffffff"
             vmargin={10}
             height={height / 10}
@@ -269,6 +278,7 @@ const OrderStack = createStackNavigator(
             align="center"
             bg="#ffffff"
             vmargin={10}
+            bottomShadow
             height={height / 10}
             horizontal>
             {/* <View style={{width: 40}} /> */}
@@ -398,6 +408,12 @@ export const SignedIn = createBottomTabNavigator(
         borderTopWidth: 0,
         borderTopColor: 'red',
         elevation: 5,
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        shadowColor: '#000000',
+        shadowOffset: {
+          height: -5,
+        },
       },
     },
     contentComponent: Sidebar,

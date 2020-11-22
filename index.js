@@ -31,5 +31,6 @@ AppRegistry.registerComponent(appName, () => App);
 
 RNPaystack.init({
   // publicKey: 'pk_test_9e6aa7b29355172e9de2ee9b19cfd6bdd99e4a04',
-  publicKey: 'pk_test_89b440f6d29f7b096d2854f7294ae4ad7455c00a',
+  // publicKey: 'p¿k_test_89b440f6d29f7b096d2854f7294ae4ad7455c00a',
+  publicKey: 'pk_live_02e6e32344ab82ffd15a36095815decc4ab69f9e',
 });

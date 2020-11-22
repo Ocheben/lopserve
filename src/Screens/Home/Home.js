@@ -32,7 +32,7 @@ const Home = props => {
   const [cylinder, setCylinder] = useState(null);
   const [buyCylinder, setBuyCylinder] = useState(false);
   // const cylinderList = [...Array(51).keys()].slice(1);
-  const cylinderList = [3, 5, 6, 10, 12.5];
+  const cylinderList = [3, 5, 6, 10, 12.5, 50];
   const {
     loading,
     dashboard: {user, totalContributionsThisYear, lastContribution},

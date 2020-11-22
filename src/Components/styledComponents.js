@@ -30,7 +30,13 @@ export const Content = styled.View`
   border-left-width: ${props => (props.ribbon ? 7 : 0)};
   border-left-color: ${props => (props.ribbon ? colors.primary : '#00000000')};
   box-shadow: ${props =>
-    props.shadow ? '0 3px 6px rgba(0,0,0,0.26)' : '0 0px 0px rgba(0,0,0,0.26)'};
+    props.noShadow
+      ? 'none'
+      : props.bottomShadow
+      ? '0 8px 6px rgba(0,0,0,0.26)'
+      : props.shadow
+      ? '0 3px 6px rgba(0,0,0,0.26)'
+      : '0 0px 0px rgba(0,0,0,0.26)'};
   elevation: ${props => (props.shadow ? 5 : 0)};
 `;
 
