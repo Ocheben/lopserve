@@ -33,11 +33,7 @@ const Home = props => {
   const [buyCylinder, setBuyCylinder] = useState(false);
   // const cylinderList = [...Array(51).keys()].slice(1);
   const cylinderList = [3, 5, 6, 10, 12.5, 50];
-  const {
-    loading,
-    dashboard: {user, totalContributionsThisYear, lastContribution},
-  } = userData;
-  const {cylinders, token} = userInfo;
+  const {token} = userInfo;
 
   useEffect(() => {
     messageListener(navigation, dispatch, token);

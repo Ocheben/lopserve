@@ -2,14 +2,11 @@ import React, {useState, useEffect} from 'react';
 import Geolocation from '@react-native-community/geolocation';
 import {
   Modal,
-  TouchableHighlight,
   TouchableOpacity,
   View,
-  Text,
   Alert,
   Dimensions,
   PermissionsAndroid,
-  Platform
 } from 'react-native';
 import {Item, Label, Input} from 'native-base';
 import MapView from 'react-native-maps';

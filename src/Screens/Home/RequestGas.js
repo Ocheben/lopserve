@@ -4,22 +4,7 @@ import {Dimensions, View, StatusBar} from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import NumberFormat from 'react-number-format';
 import {WebView} from 'react-native-webview';
-import {
-  List,
-  ListItem,
-  Icon,
-  Spinner,
-  Item,
-  Picker,
-  Label,
-  Input,
-} from 'native-base';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import RNGooglePlaces from 'react-native-google-places';
-import MapView from 'react-native-maps';
-import {Marker} from 'react-native-maps';
-import {onSignOut} from '../../_services';
-import {getContri} from '../../_store/actions/userActions';
+import {Icon, Spinner, Item, Picker, Input} from 'native-base';
 import {
   SText,
   Content,
@@ -27,8 +12,6 @@ import {
   StyledButton,
   colors,
 } from '../../Components/styledComponents';
-import {NextIcon} from '../../Components/icons';
-import {RsaIcon} from '../../Components/Vectors';
 import MapModal from '../../Components/MapModal';
 
 const {height, width} = Dimensions.get('window');
